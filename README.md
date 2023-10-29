@@ -62,7 +62,7 @@ tag = pd.read_csv("example_data/tag.csv",index_col=0)
 
 ### miMic's PyPi
 
-1. Pip install the package
+1. Install the package
 
    ```python
       pip install mimic
