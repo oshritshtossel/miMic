@@ -44,7 +44,7 @@ tag = pd.read_csv("example_data/tag.csv",index_col=0)
    ```
   Note for more information on [SAMBA](https://github.com/oshritshtossel/SAMBA) and for further distance calculations.
 
-5. Apply miMic test.
+5. Apply the miMic test.
    One can choose the following hyperparameters:
 
    - **eval** (evaluation method) Choose one of **"mann"** for binary labels, **"corr"** for continuous labels, and **"cat"** for categorical labels.
@@ -54,12 +54,20 @@ tag = pd.read_csv("example_data/tag.csv",index_col=0)
    - **save** (whether to save the corrs_df od the miMic test to computer) Choose one of **True** (defaulting value)  or **False**.
    - **tax** (Starting taxonomy of the post hoc test) Choose one of **None** ((defaulting value for "test" mode) or one of **1**, **2**, **3**, **4**, **5**, **6**, **7**. In the "plot" mode the tax is set automatically to the selected taxonomy of the "test" mode.
 
-
      ```python
       taxonomy_selected = apply_mimic(folder, tag, eval="man")
       if not taxonomy_selected:
         apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man")
    ```
 
+### miMic's PyPi
+
+1. Pip install the package
+
+   ```python
+      pip install mimic
+   ```
+
+2. 
    
    
