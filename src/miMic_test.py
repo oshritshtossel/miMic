@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import os
 import statsmodels.api as sm
-from sklearn.feature_selection import f_regression
 from scipy.stats import spearmanr
 from statsmodels.formula.api import ols
 import matplotlib as mpl
@@ -20,6 +19,12 @@ import time
 
 
 def load_img(folder_path, tag):
+    """
+    Load images from the folder they are saved there, and create an list of loaded images and list of the names
+    :param folder_path: Folder where the images are saved (str)
+    :param tag: Tag dataframe with a column named "Tag" (dataframe)
+    :return: final_array (list of loaded images), names (list of sample names)
+    """
     arrays = []
     names = []
     for file in os.listdir(folder_path):
@@ -36,6 +41,12 @@ def load_img(folder_path, tag):
 
 
 def load_from_folder(folder, tag):
+    """
+    Load all images
+    :param folder: Folder where the images are saved (str)
+    :param tag: Tag dataframe with a column named "Tag" (dataframe)
+    :return: img_arrays-ndarray of images (ndarray), bact_names-ndarray of taxa names (ndarray), tag (dataframe)
+    """
     img_arrays, names = load_img(folder, tag)
     tag.index = [str(i) for i in tag.index]
     tag = tag.loc[names]
@@ -50,6 +61,14 @@ def load_from_folder(folder, tag):
 
 
 def build_img_from_table(table, col1, col2, names):
+    """
+    Build images of test's scores (img_s) and images of test's p-values (img_p).
+    :param table: Post hoc test results (dataframe)
+    :param col1: Name of the p-value column (str)
+    :param col2: Name of the score column (str)
+    :param names: List of sample names (list)
+    :return: Images of test's scores (img_s) and images of test's p-values (img_p)
+    """
     cols = len(names.columns)
     rows = len(names.index)
     img_p = np.zeros((rows, cols))
@@ -71,6 +90,11 @@ def build_img_from_table(table, col1, col2, names):
 
 
 def create_list_of_names(list_leaves):
+    """
+    Fix taxa names for tree plot.
+    :param list_leaves: List of leaves names without the initials (list).
+    :return: Corrected list taxa names.
+    """
     list_lens = [len(i.split(";")) for i in list_leaves]
     otu_train_cols = list()
     for i, j in zip(list_leaves, list_lens):
@@ -99,6 +123,15 @@ def create_list_of_names(list_leaves):
 
 
 def creare_tree_view(names, mean_0, mean_1, directory):
+    """
+    Create correlation cladogram, such that tha size of each node is according to the -log(p-value),
+    the color of each node represents the sign of the post hoc test.
+    :param names:  List of sample names (list)
+    :param mean_0: 2D ndarray of the images filled with the post hoc p-values (ndarray).
+    :param mean_1:  2D ndarray of the images filled with the post hoc scores (ndarray).
+    :param directory: Folder to save the correlation cladogram (str)
+    :return: None
+    """
     T = ete3.PhyloTree()
     # Get the number of rows and columns in the ndarray
     num_rows, num_cols = names.shape
@@ -202,6 +235,11 @@ def creare_tree_view(names, mean_0, mean_1, directory):
     D = {1: "(k)", 2: "(p)", 3: "(c)", 4: "(o)", 5: "(f)", 6: "(g)", 7: "(s)"}
 
     def my_layout(node):
+        """
+        Design the cladogram layout.
+        :param node: Node ETE object
+        :return: None
+        """
         if node.is_leaf():
             tax = D[len(node.full_name)]
             if len(node.full_name) == 7:
@@ -217,6 +255,18 @@ def creare_tree_view(names, mean_0, mean_1, directory):
 
 
 def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
+    """
+    Plot interaction network between the significant taxa founded by miMic, such that each node color
+    is according to the sigh of the post hoc test with the tag, its shape is according to its order, and
+    its edge width is according to the correlation between the pair. There are edges only between pirs with
+    correlation above the threshold.
+    :param all_ps: All post hoc p-values (dataframe).
+    :param bact_names: Dataframe with bact names according to the image order (dataframe)
+    :param img_array: List of loaded iMic images (list).
+    :param save: Name of folder to save the plot (str).
+    :param THRESHOLD: The threshold for having an edge (float).
+    :return: None. It creates a plot.
+    """
     only_significant = all_ps[all_ps[0] < 0.05]
 
     # Initialize a DataFrame to store the first index
@@ -339,11 +389,27 @@ def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
 
 
 def get_row_and_col(bact_df, taxon):
+    """
+    Get the row and column of the iMic image that consists a certain taxon.
+    :param bact_df: Dataframe with bact names according to the image order (dataframe).
+    :param taxon: Taxonomy level (int).
+    :return: col_index (int), row_index (int).
+    """
     row_index, col_index = bact_df.index[bact_df.eq(taxon).any(axis=1)][0], bact_df.columns[bact_df.eq(taxon).any()]
     return col_index, row_index
 
 
 def calc_unique_corr(bact_df, taxon, imgs, tag, eval="corr"):
+    """
+    Apply post hoc test with tag to a specific taxon
+    :param bact_df: Dataframe with bact names according to the image order (dataframe).
+    :param taxon: Taxonomy level (int).
+    :param imgs: List of loaded iMic images (list).
+    :param tag: Tag dataframe with a column named "Tag" (dataframe)
+    :param eval: Evaluation method if the tag is binary - "man", if the tag is categorial -
+    "category", if the tag is continuous - "corr".
+    :return: col_index(int), row_index (int), scc = post hoc score (float), p = p-value of post hoc test (float).
+    """
     col_index, row_index = get_row_and_col(bact_df, taxon)
     first_col_index = list(col_index)[0]
     result = [imgs[i, row_index, first_col_index] for i in range(imgs.shape[0])]
@@ -398,6 +464,19 @@ def calc_unique_corr(bact_df, taxon, imgs, tag, eval="corr"):
 
 def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, correct_first=False,
                                 mode="test", shuffle=False):
+    """
+    Calculate the post hoc test to all the taxa over all images and build a df of scores and p-values.
+    :param folder:  Folder where the images are saved (str).
+    :param tag: Tag dataframe with a column named "Tag" (dataframe).
+    :param start_i: Starting taxonomy for the post hoc test (int)
+    :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
+    "category", if the tag is continuous - "corr" (str).
+    :param sis: Determines whether to apply sister correction. One of "Bonferroni" or "No".
+    :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Bullian).
+    :param mode: Mode of the miMic test - "test" or "plot" (str).
+    :param shuffle: Determines whether to shuffle the tag (Bullian).
+    :return: Dataframe of corrs (dataframe).
+    """
     img_arrays, names = load_img(folder, tag)
     tag = tag.loc[names]
     tag = tag.reset_index()
@@ -415,6 +494,14 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
     different_tax_in_level = [string for string in different_tax_in_level if string.strip()]
 
     def binary_rec_by_pval(different_tax_in_level, eval="corr", sis=None):
+        """
+        Apply post hoc test along the cladogram trajectories.
+        :param different_tax_in_level: List of unique tax in a certain taxonomy level in the iMic image (list).
+        :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
+        "category", if the tag is continuous - "corr" (str).
+        :param sis: Determines whether to apply sister correction. One of "Bonferroni" or "No".
+        :return: None
+        """
         for tax in different_tax_in_level:
             # Stop condition
             if tax == '' or tax == "0.0" or tax is None:
@@ -455,6 +542,14 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
                         dict_ps[son] = corrected_p_values_r[e]
 
     def rec_all_leafs(different_tax_in_level, eval, correct_first):
+        """
+        Calculate post hoc test along the cladogram trajectories recursively.
+        :param different_tax_in_level: List of unique tax in a certain taxonomy level in the iMic image (list).
+        :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
+        "category", if the tag is continuous - "corr" (str).
+        :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Bullian).
+        :return: Dataframe of corrs (dataframe).
+        """
         for tax in different_tax_in_level:
             # Stop condition
             if tax == '':
@@ -582,6 +677,13 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
         return df_corrs
 
 def calculate_p_value(img_arrays,taxon,tag):
+    """
+    Calculate p-value of nested GLM.
+    :param img_arrays: Ndarray of iMic images (ndarray)
+    :param taxon: Taxonomy level (int).
+    :param tag: Tag dataframe with a column named "Tag" (dataframe).
+    :return: nested GLM p-value (float)
+    """
     num_samples = img_arrays.shape[0]
     features = img_arrays[:,:taxon+1,:].reshape(num_samples, -1)
     if taxon == 0:
@@ -594,8 +696,6 @@ def calculate_p_value(img_arrays,taxon,tag):
         K1 = len(list(upper_model.params.index))
         ALL = len(list(full_model.params.index))
         K2 = ALL - K1
-        # pred_up = upper_model.predict(upper_features)
-        # pred_full = full_model.predict(features)
         S_A = upper_model.ssr
         S_B = full_model.ssr
         Z = (S_A/(K1 - 1))/S_B/(num_samples - K2)
@@ -607,6 +707,16 @@ def calculate_p_value(img_arrays,taxon,tag):
 
 
 def apply_nested_anova(folder, tag, mode="test", eval="man"):
+    """
+    Apply apriori nested test (ANOVA- for binary and categorical tags and GLM for continuous).
+    :param folder: Folder where the images are saved (str).
+    :param tag: Tag dataframe with a column named "Tag" (dataframe).
+    :param mode: Mode of the miMic test - "test" or "plot" (str).
+    :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
+        "category", if the tag is continuous - "corr" (str).
+    :return: In "test" mode returns the p-value, in "plot" mode returns a dataframe with the nested p-values
+    of each taxonomy level.
+    """
     img_arrays, bact_names, tag = load_from_folder(folder, tag)
     p_vals_df = pd.DataFrame(index=[1, 2, 3, 4, 5, 6, 7], columns=["nested-p"])
     if eval != "corr":
@@ -652,6 +762,12 @@ def apply_nested_anova(folder, tag, mode="test", eval="man"):
 
 
 def plot_rp_sp_anova_p(df, save):
+    """
+    Plot RP vs SP over the different taxonomy levels and the p-values of the apriori test as function of taxonomy.
+    :param df: RP and SP dataframe of the post hoc test applied (dataframe).
+    :param save: Name of folder to save the plot (str).
+    :return: None. Display the RP vs SP vs apriori p-values as function of taxonomy.
+    """
     TAX = 1
     SIZE = 15
     mpl.rc('font', family='Times New Roman')
@@ -686,6 +802,13 @@ def plot_rp_sp_anova_p(df, save):
 
 
 def calculate_rsp(df, tax, save):
+    """
+    Calculate RSP score for different betas and create the appropriate plot.
+    :param df: RP and SP dataframe of the post hoc test applied (dataframe).
+    :param tax: Starting taxonomy selected in the post hoc test (int).
+    :param save: Name of folder to save the plot (str).
+    :return: None. Display the RSP score as a function of beta.
+    """
     list_beta = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9,
                  0.95, 1]
     to_plot = pd.DataFrame(index=list_beta, columns=["RSP"])
@@ -709,12 +832,28 @@ def calculate_rsp(df, tax, save):
 
 
 def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, mode="test", save=False, tax=None):
+    """
+    Apply the apriori ANOVA test and the post hoc test of miMic.
+    :param folder: Folder path of the iMic images (str).
+    :param tag: Tag dataframe with a column named "Tag" (dataframe).
+    :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
+        "category", if the tag is continuous - "corr" (str).
+    :param sis: Determines whether to apply sister correction. One of "Bonferroni" or "No".
+    :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Bullian).
+    :param mode: Mode of the miMic test - "test" or "plot" (str).
+    :param save: Determines whether to save the final corrS_df of the miMic test (Bullian).
+    :param tax: Starting taxonomy selected in the post hoc test (int).
+    :return: If the apriori test is not significant, prints that and does not continue to the next step. If the
+    apriori test is significant prints that and continues to the post hoc test. Prints the number of RPs found in each
+    taxonomy level. At last if the the save variable is True it saves the df_corrs. It returns the selected starting taxonomy in the test mode.
+    If the function is in "plot" mode it returns 6 plots.
+    """
     if mode == "test":
         # Apply apriori nested ANOVA test
         p = apply_nested_anova(folder, tag, mode=mode, eval=eval)
         if p > 0.05:
             print(f"Apriori nested ANOVA test is not significant, getting P = {p}.")
-            #return None,f"Apriori nested ANOVA test is not significant, getting P = {p}."#for yuli
+
         else:
             print(f"Apriori nested ANOVA test is significant.\nTrying postHC miMic test.")
 
