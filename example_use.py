@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     # Apply miMic test
     taxonomy_selected = apply_mimic(folder, tag,eval="man")
-    if not taxonomy_selected :
+    if taxonomy_selected is not None:
         apply_mimic(folder, tag,mode="plot",tax=taxonomy_selected,eval="man")
 
 

@@ -15,7 +15,7 @@ from ete3 import TreeStyle, NodeStyle, TextFace, add_face_to_node
 from copy import deepcopy
 import re
 import statsmodels.stats.multitest as smt
-import time
+
 
 
 def load_img(folder_path, tag):
@@ -251,7 +251,7 @@ def creare_tree_view(names, mean_0, mean_1, directory):
 
     ts.layout_fn = my_layout
     T0.show(tree_style=deepcopy(ts))
-    T0.render(f"{directory}/correlations_tree_{time.time()}.png", tree_style=deepcopy(ts))
+    T0.render(f"{directory}/correlations_tree.png", tree_style=deepcopy(ts))
 
 
 def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
@@ -384,7 +384,7 @@ def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
     # Display the graph
     plt.axis('off')
     fig.tight_layout()
-    fig.savefig(f"{save}/interaction_{time.time()}.png")
+    fig.savefig(f"{save}/interaction.png")
     plt.show()
 
 
@@ -625,7 +625,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             plt.yticks(fontsize=SIZE)
             plt.xlim([-3, 3])
             plt.tight_layout()
-            plt.savefig(f"{directory}/hist_{time.time()}.png")
+            plt.savefig(f"{directory}/hist.png")
             plt.show()
 
             # Plot interacrions plot (2)
@@ -659,7 +659,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             plt.xticks(fontsize=SIZE)
             plt.yticks(fontsize=SIZE)
             plt.tight_layout()
-            plt.savefig(f"{directory}/corrs_within_family_{time.time()}.png")
+            plt.savefig(f"{directory}/corrs_within_family.png")
             plt.show()
 
             # Plot correlations on tree
@@ -797,7 +797,7 @@ def plot_rp_sp_anova_p(df, save):
              )
 
     plt.tight_layout()
-    plt.savefig(f"{save}/tax_vs_rp_sp_anova_p_{time.time()}.png")
+    plt.savefig(f"{save}/tax_vs_rp_sp_anova_p.png")
     plt.show()
 
 
@@ -827,7 +827,7 @@ def calculate_rsp(df, tax, save):
     plt.xticks(fontsize=SIZE)
     plt.yticks(fontsize=SIZE)
     plt.tight_layout()
-    plt.savefig(f"{save}/rsp_vs_beta_{time.time()}.png")
+    plt.savefig(f"{save}/rsp_vs_beta.png")
     plt.show()
 
 
