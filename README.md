@@ -69,7 +69,7 @@ tag = pd.read_csv("example_data/tag.csv",index_col=0)
 pip install mimic-da
 ```
 
-2. 1. Load the raw ASVs table in the following format: the first column is named "ID", each row represents a sample and each column represents an ASV. The last row contains the taxonomy information, named "taxonomy".
+2. Load the raw ASVs table in the following format: the first column is named "ID", each row represents a sample and each column represents an ASV. The last row contains the taxonomy information, named "taxonomy".
 
 ```python
 df = pd.read_csv("example_data/for_process.csv")
