@@ -11,11 +11,10 @@ from scipy.stats import mannwhitneyu, kruskal
 import networkx as nx
 import ete3
 from src import create_tax_tree
-from ete3 import TreeStyle, NodeStyle, TextFace, add_face_to_node
+from ete3 import NodeStyle, TextFace, add_face_to_node, TreeStyle
 from copy import deepcopy
 import re
 import statsmodels.stats.multitest as smt
-
 
 
 def load_img(folder_path, tag):
@@ -788,7 +787,7 @@ def plot_rp_sp_anova_p(df, save):
     ax2.set_ylabel("-log10(p-value)", fontsize=SIZE, color="green")  # Customize the label as needed
     ax2.tick_params(axis="y", labelsize=SIZE, color="green")  # Adjust tick label font size
     logged = df["nested-p"].apply(lambda x: -np.log10(x))
-    ax2.plot(ax1.get_xticks(), logged, linestyle="-", marker="o", markersize=5, color="green",
+    ax2.plot(ax1.get_xticks(), logged.values, linestyle="-", marker="o", markersize=5, color="green",
              label="Line Plot")
     logged_ = logged.values[TAX:]
 
