@@ -172,7 +172,7 @@ def creare_tree_view(names, mean_0, mean_1, directory):
                 t.add_feature("max_1_grad", mean_1[names == ";".join(s[0])].mean())
                 t.add_feature("max_2_grad", mean_0[names == ";".join(s[0])].mean())
 
-    for name, val in pd.Series(data=mean_0[-1], index=otu_train_cols).iteritems():
+    for name, val in pd.Series(data=mean_0[-1], index=otu_train_cols).items():
         name = name.replace(" ", "")
         name = re.split("; |__|;", name)
         name = [i for i in name if len(i) > 2 or (len(i) > 0 and i[-1].isnumeric())]
