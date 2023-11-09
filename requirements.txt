@@ -5,7 +5,7 @@ scipy>=1.5.0
 matplotlib== 3.3.4
 networkx>=2.5.1
 ete3==3.1.2
-MIPMLP>=1.2.18
+MIPMLP>=1.2.8
 samba-metric>=0.0.9
 pyqt5==5.15.10
 
