@@ -23,6 +23,6 @@ if __name__ == '__main__':
     # Apply miMic test
     taxonomy_selected = apply_mimic(folder, tag, eval="man")
     if taxonomy_selected is not None:
-        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man",save=False)
+        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", save=False)
 
     c = 0

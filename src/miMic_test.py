@@ -384,7 +384,7 @@ def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
     plt.axis('off')
     fig.tight_layout()
     fig.savefig(f"{save}/interaction.png")
-    plt.show()
+    plt.show(block=False)
 
 
 def get_row_and_col(bact_df, taxon):
@@ -625,7 +625,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             plt.xlim([-3, 3])
             plt.tight_layout()
             plt.savefig(f"{directory}/hist.png")
-            plt.show()
+            plt.show(block=False)
 
             # Plot interacrions plot (2)
             build_interactions(all_ps_df, bact_names_df, img_arrays, directory)
@@ -659,7 +659,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             plt.yticks(fontsize=SIZE)
             plt.tight_layout()
             plt.savefig(f"{directory}/corrs_within_family.png")
-            plt.show()
+            plt.show(block=False)
 
             # Plot correlations on tree
             creare_tree_view(bact_names, imgs_p, imgs_s, directory)
@@ -797,7 +797,7 @@ def plot_rp_sp_anova_p(df, save):
 
     plt.tight_layout()
     plt.savefig(f"{save}/tax_vs_rp_sp_anova_p.png")
-    plt.show()
+    plt.show(block=False)
 
 
 def calculate_rsp(df, tax, save):
@@ -827,7 +827,7 @@ def calculate_rsp(df, tax, save):
     plt.yticks(fontsize=SIZE)
     plt.tight_layout()
     plt.savefig(f"{save}/rsp_vs_beta.png")
-    plt.show()
+    plt.show(block=False)
 
 
 def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, mode="test", save=False, tax=None):

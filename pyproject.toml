@@ -19,7 +19,7 @@ classifiers = [
 keywords = ["Diffrential analysis","cladogram","Mann-Whitney","microbiome"]
 dependencies = [
     "numpy>=1.24.3",
-    "pandas>=1.3.4",
+    "pandas==2.0.3",
     "scipy>=1.5.0",
     "networkx>=2.5.1",
     "matplotlib==3.3.4",
