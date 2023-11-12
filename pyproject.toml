@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mimic-da"
-version = "0.0.4"
+version = "0.0.5"
 description = ""
 readme = "README.md"
 authors = [{ name = "Oshrit Shtossel", email = "oshritvig@gmail.com" }]
@@ -19,12 +19,14 @@ classifiers = [
 keywords = ["Diffrential analysis","cladogram","Mann-Whitney","microbiome"]
 dependencies = [
     "numpy>=1.24.3",
-    "pandas==2.0.3",
+    "pandas>=2.0.3",
     "scipy>=1.5.0",
     "networkx>=2.5.1",
     "matplotlib",
     "samba-metric>=0.0.9",
     "MIPMLP>=1.2.8",
-    "pyqt5==5.15.10"
+    "pyqt5==5.15.10",
+    "ete3==3.1.2",
+    "statsmodels>=0.14.0"
 ]
 requires-python = ">=3.7"
