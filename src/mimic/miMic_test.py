@@ -670,7 +670,10 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
     df_corrs.index = [i.split("_")[0] for i in df_corrs.index]
     df_corrs = df_corrs.groupby(df_corrs.index).mean()
     if correct_first and start_i > 1:
-        df_filtered = df_corrs[~df_corrs.index.str.contains('|'.join(to_throw.index))]
+        try:
+            df_filtered = df_corrs[~df_corrs.index.str.contains('|'.join(to_throw.index))]
+        except:
+            df_filtered = df_corrs
         return df_filtered
     else:
         return df_corrs
