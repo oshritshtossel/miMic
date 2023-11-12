@@ -120,9 +120,9 @@ import MIPMLP
 import samba
 
 try:
-    from miMic_test import apply_mimic
+    from mimic import apply_mimic
 except:
-    from src import apply_mimic
+    from src.mimic import apply_mimic
 
 if __name__ == '__main__':
 
