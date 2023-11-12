@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mimic-da"
-version = "0.0.3"
+version = "0.0.4"
 description = ""
 readme = "README.md"
 authors = [{ name = "Oshrit Shtossel", email = "oshritvig@gmail.com" }]
@@ -22,7 +22,7 @@ dependencies = [
     "pandas==2.0.3",
     "scipy>=1.5.0",
     "networkx>=2.5.1",
-    "matplotlib==3.3.4",
+    "matplotlib",
     "samba-metric>=0.0.9",
     "MIPMLP>=1.2.8",
     "pyqt5==5.15.10"
