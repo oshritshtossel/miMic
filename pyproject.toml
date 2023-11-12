@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mimic-da"
-version = "0.0.5"
+version = "0.0.6"
 description = ""
 readme = "README.md"
 authors = [{ name = "Oshrit Shtossel", email = "oshritvig@gmail.com" }]
@@ -16,7 +16,7 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["Diffrential analysis","cladogram","Mann-Whitney","microbiome"]
+keywords = ["Diffrential analysis", "cladogram", "Mann-Whitney", "microbiome"]
 dependencies = [
     "numpy>=1.24.3",
     "pandas>=2.0.3",

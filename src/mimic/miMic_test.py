@@ -10,7 +10,7 @@ from scipy import stats
 from scipy.stats import mannwhitneyu, kruskal
 import networkx as nx
 import ete3
-from . import create_tax_tree
+from .tax_tree_create import create_tax_tree
 from ete3 import NodeStyle, TextFace, add_face_to_node, TreeStyle
 from copy import deepcopy
 import re
@@ -675,7 +675,8 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
     else:
         return df_corrs
 
-def calculate_p_value(img_arrays,taxon,tag):
+
+def calculate_p_value(img_arrays, taxon, tag):
     """
     Calculate p-value of nested GLM.
     :param img_arrays: Ndarray of iMic images (ndarray)
@@ -684,25 +685,22 @@ def calculate_p_value(img_arrays,taxon,tag):
     :return: nested GLM p-value (float)
     """
     num_samples = img_arrays.shape[0]
-    features = img_arrays[:,:taxon+1,:].reshape(num_samples, -1)
+    features = img_arrays[:, :taxon + 1, :].reshape(num_samples, -1)
     if taxon == 0:
         model = sm.OLS(tag, features).fit()
         return model.f_pvalue
     else:
         full_model = sm.OLS(tag, features).fit()
-        upper_features = img_arrays[:,:taxon,:].reshape(num_samples, -1)
+        upper_features = img_arrays[:, :taxon, :].reshape(num_samples, -1)
         upper_model = sm.OLS(tag, upper_features).fit()
         K1 = len(list(upper_model.params.index))
         ALL = len(list(full_model.params.index))
         K2 = ALL - K1
         S_A = upper_model.ssr
         S_B = full_model.ssr
-        Z = (S_A/(K1 - 1))/S_B/(num_samples - K2)
+        Z = (S_A / (K1 - 1)) / S_B / (num_samples - K2)
         p_value = 1 - stats.f.cdf(Z, K1 - 1, num_samples - K2)
         return p_value
-
-
-
 
 
 def apply_nested_anova(folder, tag, mode="test", eval="man"):
@@ -747,7 +745,7 @@ def apply_nested_anova(folder, tag, mode="test", eval="man"):
     else:
         # Apply regression on all the flattened tree
         for taxon_lavel in range(img_arrays.shape[1]):
-            P = calculate_p_value(img_arrays,taxon_lavel,tag)
+            P = calculate_p_value(img_arrays, taxon_lavel, tag)
             p_vals_df["nested-p"][taxon_lavel + 1] = P
             if P < 0.05:
                 print(f"Test succeeded in level {taxon_lavel + 1}:P = {P}")
