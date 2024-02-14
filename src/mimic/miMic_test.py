@@ -1173,26 +1173,31 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
             corrected_list_names = create_list_of_names(df_corrs_leafs.index)
             original_list_names = df_corrs_leafs.index
 
-            # drpoing leafs that have sons- not relevant
+            # droping leafs that have sons- not relevant
             for i, corrected_name in zip(original_list_names, corrected_list_names):
                 if any(name.startswith(corrected_name) for name in corrected_list_names if name != corrected_name):
                     df_corrs_leafs = df_corrs_leafs.drop(i)
 
-            df_corrs = pd.concat([df_corrs_123, df_corrs_leafs])
-            df_corrs = df_corrs[~df_corrs.index.duplicated(keep='first')]
+            if t1!='noAnova':
+                df_corrs = pd.concat([df_corrs_123, df_corrs_leafs])
+                df_corrs = df_corrs[~df_corrs.index.duplicated(keep='first')]
 
-            common_rows = pd.merge(df_corrs_leafs, df_corrs_123, how='inner', left_index=True, right_index=True)
+                common_rows = pd.merge(df_corrs_leafs, df_corrs_123, how='inner', left_index=True, right_index=True)
 
-            # Subtract the common rows from df_corrs_leafs
-            df_corrs_leafs_difference = df_corrs_leafs[~df_corrs_leafs.index.isin(common_rows.index)]
-            df_corrs_leafs_difference.to_pickle("u_test_without_mimic.pkl")
-            df_corrs.to_pickle("df_corrs.pkl")
+                # Subtract the common rows from df_corrs_leafs
+                df_corrs_leafs_difference = df_corrs_leafs[~df_corrs_leafs.index.isin(common_rows.index)]
+                df_corrs_leafs_difference.to_pickle("u_test_without_mimic.pkl")
+                df_corrs.to_pickle("df_corrs.pkl")
 
-            df_corrs123.to_csv(f"{folder}/just_mimic.csv")
-            # save statistic and p-values df
-            if save:
-                df_corrs.to_csv(f"{folder}/df_corrs.csv")
-                df_corrs_leafs_difference.to_csv(f"{folder}/u_test_without_mimic.csv")
+                df_corrs123.to_csv(f"{folder}/just_mimic.csv")
+                # save statistic and p-values df
+                if save:
+                    df_corrs.to_csv(f"{folder}/df_corrs.csv")
+                    df_corrs_leafs_difference.to_csv(f"{folder}/u_test_without_mimic.csv")
+            else:
+                df_corrs_leafs.to_pickle("df_corrs.pkl")
+                if save:
+                    df_corrs_leafs.to_csv(f"{folder}/df_corrs.csv")
 
             return t1
 
