@@ -1,3 +1,6 @@
+import pickle
+import warnings
+
 import pandas as pd
 import numpy as np
 import os
@@ -5,6 +8,10 @@ import statsmodels.api as sm
 from scipy.stats import spearmanr
 from statsmodels.formula.api import ols
 import matplotlib as mpl
+import matplotlib
+import matplotlib.cm as cm
+
+matplotlib.use('Qt5Agg')
 import matplotlib.pyplot as plt
 from scipy import stats
 from scipy.stats import mannwhitneyu, kruskal
@@ -13,7 +20,6 @@ import ete3
 from .tax_tree_create import create_tax_tree
 from ete3 import NodeStyle, TextFace, add_face_to_node, TreeStyle
 from copy import deepcopy
-import re
 import statsmodels.stats.multitest as smt
 
 
@@ -31,9 +37,14 @@ def load_img(folder_path, tag):
             if file == "bact_names.npy":
                 continue
             file_path = os.path.join(folder_path, file)
+            # Check if the file name (without the extension) is in the index of a variable 'tag'
             if file_path.split("\\")[-1].replace(".npy", "") in [str(i) for i in tag.index]:
                 arrays.append(np.load(file_path, allow_pickle=True, mmap_mode='r'))
                 names.append(file_path.split("\\")[-1].replace(".npy", ""))
+            # depends on your computer system
+            elif file_path.split("/")[-1].replace(".npy", "") in [str(i) for i in tag.index]:
+                arrays.append(np.load(file_path, allow_pickle=True, mmap_mode='r'))
+                names.append(file_path.split("/")[-1].replace(".npy", ""))
 
     final_array = np.stack(arrays, axis=0)
     return final_array, names
@@ -68,6 +79,8 @@ def build_img_from_table(table, col1, col2, names):
     :param names: List of sample names (list)
     :return: Images of test's scores (img_s) and images of test's p-values (img_p)
     """
+    pd.set_option('display.float_format', '{:.50f}'.format)
+
     cols = len(names.columns)
     rows = len(names.index)
     img_p = np.zeros((rows, cols))
@@ -97,106 +110,243 @@ def create_list_of_names(list_leaves):
     list_lens = [len(i.split(";")) for i in list_leaves]
     otu_train_cols = list()
     for i, j in zip(list_leaves, list_lens):
+        parts = i.rsplit("_", maxsplit=1)
+        flag = False
+        if parts == 2:
+            flag = True
         if j == 1:
-            updated = "k__" + i.split(";")[0]
+            if flag and parts[2].isdigit():
+                updated = "k__" + i.split(";")[0].split("_")[0]
+            else:
+                updated = "k__" + i.split(";")[0]
+
         elif j == 2:
-            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1]
+            if flag and parts[2].isdigit():
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1].split("_")[0]
+            else:
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1]
+
         elif j == 3:
-            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[2]
+            if flag and parts[2].isdigit():
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
+                          i.split(";")[2].split("_")[
+                              0]
+            else:
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
+                          i.split(";")[2]
         elif j == 4:
-            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                2] + ";" + "o__" + i.split(";")[3]
+            if flag and parts[2].isdigit():
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3].split("_")[0]
+
+            else:
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3]
+
         elif j == 5:
-            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4]
+            if flag and parts[2].isdigit():
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4].split("_")[0]
+            else:
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4]
+
         elif j == 6:
-            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[5]
+            if flag and parts[2].isdigit():
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
+                          i.split(";")[5].split("_")[0]
+            else:
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
+                          i.split(";")[5]
+
         elif j == 7:
-            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
-                          5] + ";" + "s__" + \
-                      i.split(";")[6]
+            if flag and parts[2].isdigit():
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
+                              5] + ";" + "s__" + i.split(";")[6].split("_")[0]
+            else:
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
+                              5] + ";" + "s__" + i.split(";")[6]
         otu_train_cols.append(updated)
     return otu_train_cols
 
 
-def creare_tree_view(names, mean_0, mean_1, directory):
+def find_actual_name(s, first_non_empty_cells):
+    """
+    Find the actual name of the cell before fixing the name to the correct version of taxonomy.
+    :param s: Cell name (str).
+    :param first_non_empty_cells: List of first non-empty cells (list).
+    :return: Actual name of the cell (str).
+    """
+    for cell in first_non_empty_cells:
+        if cell == s or cell.startswith(s + '_'):
+            return cell
+    return None
+
+
+def rgba_to_hex(rgba):
+    """
+    Convert rgba to hex.
+    :param rgba: rgba color (tuple).
+    :return: hex color (str).
+    """
+    return matplotlib.colors.rgb2hex(rgba)
+
+
+def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_colors=None):
     """
     Create correlation cladogram, such that tha size of each node is according to the -log(p-value),
-    the color of each node represents the sign of the post hoc test.
+    the color of each node represents the sign of the post hoc test and the background color of the node is based on the family.
     :param names:  List of sample names (list)
     :param mean_0: 2D ndarray of the images filled with the post hoc p-values (ndarray).
     :param mean_1:  2D ndarray of the images filled with the post hoc scores (ndarray).
     :param directory: Folder to save the correlation cladogram (str)
+    :param family_colors: Dictionary of family colors (dict)
     :return: None
     """
     T = ete3.PhyloTree()
+    u_test = pd.read_pickle("u_test_without_mimic.pkl")
+
     # Get the number of rows and columns in the ndarray
     num_rows, num_cols = names.shape
 
     # Create an empty list to store the first non-empty cell for each column
     first_non_empty_cells = [None] * num_cols
 
-    # Iterate through the ndarray starting from the lowest row (row 7)
-    for row_idx in reversed(range(num_rows)):
-        for col_idx in range(num_cols):
+    # first_non_empty_cells will store all the leafs
+    for col_idx in range(num_cols):
+        if col_idx == 114:
+            c = 0
+        flag = False
+        for row_idx in reversed(range(num_rows)):
             # Check if the current cell is empty (None or nan)
-            if names[row_idx, col_idx] == '':
+            contains_letter = any(char.isalpha() for char in names[row_idx, col_idx])
+            if not contains_letter:
                 continue
             # If the current cell is not empty, update the first non-empty cell for this column
             if first_non_empty_cells[col_idx] is None:
-                first_non_empty_cells[col_idx] = names[row_idx, col_idx]
+                if mean_0[row_idx, col_idx] < threshold_p and mean_0[row_idx, col_idx] != 0.0:
+                    flag = True
+                    first_non_empty_cells[col_idx] = names[row_idx, col_idx]
+                if flag == False:
+                    first_non_empty_cells[col_idx] = '0.0'
+                break
 
+    # removing all the leafs that are not significant, those labeled with 0.0
+    first_non_empty_cells = [cell for cell in first_non_empty_cells if cell != '0.0']
     otu_train_cols = create_list_of_names(first_non_empty_cells)
+
     g = create_tax_tree(pd.Series(index=otu_train_cols))
     epsilon = 1e-1000
     root = list(filter(lambda p: p[1] == 0, g.in_degree))[0][0]
     T.get_tree_root().species = root[0]
+    warnings.filterwarnings("ignore", message="divide by zero encountered in log10")
     T.get_tree_root().add_feature("max_0_grad", -np.log10(mean_0[0].mean() + epsilon))
     T.get_tree_root().add_feature("max_1_grad", mean_1[0].mean())
     T.get_tree_root().add_feature("max_2_grad", mean_0[0].mean())
+
     for node in g.nodes:
         for s in g.succ[node]:
+
+            # for u test without mimic results the name is fixed to the correct version of the taxonomy
+            # for the mimic results the name is the actual name
+            name_actual_cell = find_actual_name(';'.join(s[0]), first_non_empty_cells)
+            if name_actual_cell is not None:
+                actual_name = name_actual_cell
+            else:
+                actual_name = ';'.join(s[0])
+
             if s[0][-1] not in T or not any([anc.species == a for anc, a in
                                              zip(T.search_nodes(name=s[0][-1])[0].get_ancestors()[:-1],
                                                  reversed(s[0]))]):
                 t = T
                 if len(s[0]) != 1:
-                    print(s[0])
                     t = T.search_nodes(full_name=s[0][:-1])[0]
+
+                # taking the node index, if the node is in u_test (without mimic results)
+                in_utest_index = u_test.index[u_test.index.isin([";".join(s[0])])]
+                if in_utest_index != None:
+
+                    t = t.add_child(name=s[0][-1])
+                    t.species = s[0][-1]
+                    t.add_feature("full_name", s[0])
+                    t.add_feature("max_0_grad", -np.log10(u_test.loc[in_utest_index]['p'].iloc[0] + epsilon))
+                    t.add_feature("max_1_grad", u_test.loc[in_utest_index]['scc'].iloc[0])
+                    t.add_feature("max_2_grad", u_test.loc[in_utest_index]['p'].iloc[0])
+
+                    # if the name is including family level, we will set the family color
+                    if family_colors != None:
+                        split_name = str(in_utest_index[0]).split(';')
+                        if len(split_name) >= 5:
+                            family_color = family_colors.get(split_name[4], "nocolor")
+                        else:
+                            # if the name is not including family level, we will not set a family color
+                            family_color = "nocolor"
+                        t.add_feature("family_color", family_color)
+
+                    continue
+
+                # nodes in mimic results without u-test
                 t = t.add_child(name=s[0][-1])
                 t.species = s[0][-1]
                 t.add_feature("full_name", s[0])
-                t.add_feature("max_0_grad", -np.log10(mean_0[names == ";".join(s[0])].mean() + epsilon))
-                t.add_feature("max_1_grad", mean_1[names == ";".join(s[0])].mean())
-                t.add_feature("max_2_grad", mean_0[names == ";".join(s[0])].mean())
+                t.add_feature("max_0_grad", -np.log10(mean_0[names == actual_name].mean() + epsilon))
+                t.add_feature("max_1_grad", mean_1[names == actual_name].mean())
+                t.add_feature("max_2_grad", mean_0[names == actual_name].mean())
 
-    for name, val in pd.Series(data=mean_0[-1], index=otu_train_cols).items():
-        name = name.replace(" ", "")
-        name = re.split("; |__|;", name)
-        name = [i for i in name if len(i) > 2 or (len(i) > 0 and i[-1].isnumeric())]
+                if family_colors != None:
+                    # setting the family color
+                    split_name = actual_name.split(';')
+                    if len(split_name) >= 5:
+                        family_color = family_colors.get(split_name[4], "nocolor")
+                    else:
+                        family_color = "nocolor"
+                    t.add_feature("family_color", family_color)
 
-        t = T.search_nodes(full_name=tuple(name))[0]
-        t.dist = val
     T0 = T.copy("deepcopy")
-
     bound_0 = 0
     for t in T0.get_descendants():
         nstyle = NodeStyle()
         nstyle["size"] = 20
         nstyle["fgcolor"] = "gray"
-        if t.max_1_grad > bound_0 and t.max_2_grad < 0.05:
-            print("; ".join(reversed([t.name] + [i.name for i in t.get_ancestors() if len(i.name) > 0])))
-            nstyle["fgcolor"] = "blue"
-            nstyle["size"] = t.max_0_grad * 5
-        elif t.max_1_grad < bound_0 and t.max_2_grad < 0.05:
-            print("; ".join(reversed([t.name] + [i.name for i in t.get_ancestors() if len(i.name) > 0])))
-            nstyle["fgcolor"] = "red"
-            nstyle["size"] = t.max_0_grad * 5
+        name = ";".join(t.full_name)
 
+        if (t.max_1_grad > bound_0) and (t.max_2_grad < threshold_p):
+            nstyle["fgcolor"] = "blue"
+            nstyle["size"] = t.max_0_grad * 15
+
+            if name in u_test.index and len(name.split(';')) == 7:
+                nstyle["shape"] = "square"
+
+            if family_colors != None:
+                if t.family_color != "nocolor":
+                    hex_color = rgba_to_hex(t.family_color)
+                    nstyle['bgcolor'] = hex_color
+
+        elif (t.max_1_grad < bound_0) and (t.max_2_grad < threshold_p):
+
+            nstyle["fgcolor"] = "red"
+            nstyle["size"] = t.max_0_grad * 15
+
+            if name in u_test.index and len(name.split(';')) == 7:
+                nstyle["shape"] = "square"
+
+            if family_colors != None:
+                if t.family_color != "nocolor":
+                    hex_color = rgba_to_hex(t.family_color)
+                    nstyle['bgcolor'] = hex_color
+
+        # if the node is not significant we will still color it by its family color
+        if family_colors != None:
+            if t.family_color != "nocolor":
+                hex_color = rgba_to_hex(t.family_color)
+                nstyle['bgcolor'] = hex_color
 
         elif not t.is_root():
+            # if the node is not significant, we will detach it
             if not any([anc.max_0_grad > bound_0 for anc in t.get_ancestors()[:-1]]) and not any(
                     [dec.max_0_grad > bound_0 for dec in t.get_descendants()]):
                 t.detach()
@@ -240,40 +390,49 @@ def creare_tree_view(names, mean_0, mean_1, directory):
         :return: None
         """
         if node.is_leaf():
-            tax = D[len(node.full_name)]
-            if len(node.full_name) == 7:
-                name = node.up.name.replace("[", "").replace("]", "") + " " + node.name.lower()
-            else:
-                name = node.name
-            F = TextFace(f"{name} {tax} ", fsize=60, ftype="Arial")  # {tax}
-            add_face_to_node(F, node, column=0, position="branch-right")
+            try:
+                tax = D[len(node.full_name)]
+                if len(node.full_name) == 7:
+                    name = node.up.name.replace("[", "").replace("]", "") + " " + node.name.lower()
+                else:
+                    name = node.name
+                F = TextFace(f"{name} {tax} ", fsize=100, ftype="Arial")  # {tax}
+                add_face_to_node(F, node, column=0, position="branch-right")
+            except:
+                pass
 
     ts.layout_fn = my_layout
-    T0.show(tree_style=deepcopy(ts))
+    T0.show(tree_style=(ts))
     T0.render(f"{directory}/correlations_tree.png", tree_style=deepcopy(ts))
 
 
-def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
+def build_interactions(bact_names, img_array, save, family_colors,threshold_p=0.05, THRESHOLD=0.5):
     """
     Plot interaction network between the significant taxa founded by miMic, such that each node color
     is according to the sigh of the post hoc test with the tag, its shape is according to its order, and
     its edge width is according to the correlation between the pair. There are edges only between pirs with
     correlation above the threshold.
-    :param all_ps: All post hoc p-values (dataframe).
     :param bact_names: Dataframe with bact names according to the image order (dataframe)
     :param img_array: List of loaded iMic images (list).
     :param save: Name of folder to save the plot (str).
+    :param family_colors: Dictionary of family colors (dict).
+    :param threshold_p: The threshold for significant value (float).
     :param THRESHOLD: The threshold for having an edge (float).
     :return: None. It creates a plot.
     """
-    only_significant = all_ps[all_ps[0] < 0.05]
+    all_ps = pd.read_pickle("df_corrs.pkl")
+    all_ps['len'] = [len(i.split(";")) for i in all_ps.index]
+    all_ps.rename(columns={'p': '0'}, inplace=True)
+    all_ps.rename(columns={'scc': 's'}, inplace=True)
 
+    only_significant = all_ps[all_ps['0'] < threshold_p]
     # Initialize a DataFrame to store the first index
     df_index = pd.DataFrame(index=only_significant.index, columns=["index"])
 
     for pixel in only_significant.index:
         row = all_ps.loc[pixel]["len"]
-        indexes = min([i for i, value in enumerate(bact_names.loc[row]) if value == pixel])
+        indexes = min(
+            [i for i, value in enumerate(bact_names.loc[row]) if value == pixel or value.split('_')[0] == pixel])
         df_index["index"][pixel] = indexes
     only_significant["index"] = df_index["index"]
     # only species
@@ -285,16 +444,19 @@ def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
         only_significant.index]
     only_significant["fixed_len"] = [len(i.split(";")) for i in only_significant.index]
     only_significant = only_significant[only_significant["fixed_len"] == 7]
-    only_significant["size"] = -np.log10(only_significant[0]) * 30
+    only_significant["size"] = -np.log10(only_significant['0']) * 30
     only_significant["color"] = ["red" for i in only_significant.index]
     only_significant["color"][only_significant["s"] > 0] = "blue"
     only_significant["order"] = [i.split(";")[3] for i in only_significant.index]
 
     # Create a mapping of unique orders to node shapes
     unique_orders = only_significant['order'].unique()
-    shapes = ['o', 's', 'd', '^', 'v', '>', '<', 'p', 'H', '8', 'o']  # Shapes for unique orders
+    shapes = ['8', '4', '3', '2', '1', 'x', '+', 'D', 'h', 'p', 's', 'o', 'v', '^', '<', '>', 'd', '8', 'P', '*', 'X',
+              '_', '|']  # Shapes for unique orders
 
-    shape_mapping = dict(zip(unique_orders, shapes))
+    shape_mapping = {}
+    for i, order in enumerate(unique_orders):
+        shape_mapping[order] = shapes[i % len(shapes)]  # Cycle through shapes list using modulo operator
 
     # Create a new "shape" column based on the mapping
     only_significant['shape'] = only_significant['order'].map(shape_mapping)
@@ -364,6 +526,7 @@ def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
     # Add labels to nodes
     # Calculate positions for node labels on the periphery
     node_labels = {i: node['name'] for i, node in G.nodes(data=True)}
+
     # Calculate positions for node labels (vertical orientation)
     label_positions = {node: (pos[node][0], pos[node][1] + 0.01) for node in G.nodes()}
     description = nx.draw_networkx_labels(G, label_positions, labels=node_labels, font_size=10, font_color='black')
@@ -379,6 +542,12 @@ def build_interactions(all_ps, bact_names, img_array, save, THRESHOLD=0.5):
         t.set_position(position)
         t.set_rotation(theta * 360.0 / (2.0 * np.pi))
         t.set_clip_on(False)
+
+        if family_colors:
+            family_name = [i.split(';')[4] for i in inter_corr.index if
+                           node_labels[node] in i]
+            font_color = family_colors.get(family_name[0], "black")  # Default font color is black
+            t.set_color(font_color)
 
     # Display the graph
     plt.axis('off')
@@ -412,6 +581,8 @@ def calc_unique_corr(bact_df, taxon, imgs, tag, eval="corr"):
     col_index, row_index = get_row_and_col(bact_df, taxon)
     first_col_index = list(col_index)[0]
     result = [imgs[i, row_index, first_col_index] for i in range(imgs.shape[0])]
+    # result = [imgs[i,row_index,first_col_index] for i in range (imgs.shape[1],-1,-1) if imgs[i,row_index,first_col_index] != 0.0]
+
     # calc corr
     if eval == "corr":
         scc, p = spearmanr(result, tag)
@@ -462,7 +633,7 @@ def calc_unique_corr(bact_df, taxon, imgs, tag, eval="corr"):
 
 
 def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, correct_first=False,
-                                mode="test", shuffle=False):
+                                mode="test", threshold_p=0.05, shuffle=False, colorful=None):
     """
     Calculate the post hoc test to all the taxa over all images and build a df of scores and p-values.
     :param folder:  Folder where the images are saved (str).
@@ -471,26 +642,43 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
     :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
     "category", if the tag is continuous - "corr" (str).
     :param sis: Determines whether to apply sister correction. One of "Bonferroni" or "No".
-    :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Bullian).
+    :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Boolean).
     :param mode: Mode of the miMic test - "test" or "plot" (str).
-    :param shuffle: Determines whether to shuffle the tag (Bullian).
+    :param threshold_p: The threshold for significant value (float).
+    :param shuffle: Determines whether to shuffle the tag (Boolean).
+    :param colorful: Determines whether to color the nodes by their family (Boolean).
     :return: Dataframe of corrs (dataframe).
     """
+
     img_arrays, names = load_img(folder, tag)
     tag = tag.loc[names]
     tag = tag.reset_index()
     if shuffle:
+        warnings.filterwarnings("ignore", message="you are shuffling a 'Series' object")
         np.random.shuffle(tag["Tag"])
     bact_names = np.load(f'{folder}/bact_names.npy', allow_pickle=True)
     bact_names_df = pd.DataFrame(bact_names)
+
+    if mode == 'leafs' or start_i == 'noAnova':
+        start_i = 0
+        df = bact_names_df.replace('0.0', pd.NA)
+        df = df.apply(lambda col: col.dropna().iloc[-1])
+        # now df contains only the last leaf of each branch
+        bact_names_df_leaf = df.to_frame().T
 
     dict_corrs = dict()
     dict_ps = dict()
     all_ps = dict()
     all_stat = dict()
 
-    different_tax_in_level = list(set(bact_names_df.iloc[start_i]))  # tax 1
+    if mode == 'leafs' or start_i == 'noAnova':
+        # Getting the unique leafs taxa based on 'bac_names_df_leaf', start_i=0 because we extracted all the leafs to one row
+        different_tax_in_level = list(set(bact_names_df_leaf.iloc[start_i]))
+    else:
+        different_tax_in_level = list(set(bact_names_df.iloc[start_i]))
+
     different_tax_in_level = [string for string in different_tax_in_level if string.strip()]
+    different_tax_in_level = sorted(different_tax_in_level, reverse=True)
 
     def binary_rec_by_pval(different_tax_in_level, eval="corr", sis=None):
         """
@@ -502,6 +690,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
         :return: None
         """
         for tax in different_tax_in_level:
+
             # Stop condition
             if tax == '' or tax == "0.0" or tax is None:
                 # Leaf in the middle of the tree
@@ -510,13 +699,14 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             col_index, row_index, scc, p = calc_unique_corr(bact_names_df, tax, img_arrays, tag, eval)
             all_ps[tax] = p
             all_stat[tax] = scc
-            if p >= 0.05:
+            if p >= threshold_p:
                 # Not significant - stop
                 continue
             if (row_index + 1) >= bact_names_df.shape[0]:
                 # Leaf in the end of the tree
                 dict_corrs[tax] = scc
                 dict_ps[tax] = p
+
                 continue
 
             all_sons = set(bact_names_df[col_index].loc[row_index + 1])
@@ -527,61 +717,56 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
                 dict_ps[tax] = p
 
             if sis == "bonferroni" and len(all_sons) > 1 and len(all_sons.intersection(dict_ps.keys())) > 0:
-                sons_pv = {k: all_ps[k] for k in all_sons}
+                sorted_sons = sorted(list(all_sons))
+                sons_pv = {k: all_ps[k] for k in sorted_sons}
                 min_son = min(sons_pv, key=sons_pv.get)
                 del sons_pv[min_son]
 
                 rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(sons_pv.values()),
                                                                            method="bonferroni")
                 for e, son in enumerate(sons_pv):
-                    if corrected_p_values_r[e] >= 0.05:
+                    if corrected_p_values_r[e] >= threshold_p:
                         for bact in [k for k in dict_ps.keys() if son in k]:
+                            # the son is not significant so we are giving it a p-value of 0.06
+                            all_ps[bact] = 0.06
                             del dict_ps[bact]
                     else:
                         dict_ps[son] = corrected_p_values_r[e]
+                        all_ps[son] = corrected_p_values_r[e]
 
-    def rec_all_leafs(different_tax_in_level, eval, correct_first):
-        """
-        Calculate post hoc test along the cladogram trajectories recursively.
-        :param different_tax_in_level: List of unique tax in a certain taxonomy level in the iMic image (list).
-        :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
-        "category", if the tag is continuous - "corr" (str).
-        :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Bullian).
-        :return: Dataframe of corrs (dataframe).
-        """
-        for tax in different_tax_in_level:
-            # Stop condition
-            if tax == '':
-                # Leaf in the middle of the tree
-                return "leaf"
-
-            col_index, row_index, scc, p = calc_unique_corr(bact_names_df, tax, img_arrays, tag, eval)
-            if (row_index + 1) >= bact_names_df.shape[0]:
-                # Leaf in the end of the tree
-                dict_corrs[tax] = scc
-                dict_ps[tax] = p
-                continue
-
-            all_sons = set(bact_names_df[col_index].loc[row_index + 1])
-            ret = rec_all_leafs(all_sons, eval, correct_first)
-            if ret == "leaf":
-                # This is the leaf:
-                dict_corrs[tax] = scc
-                dict_ps[tax] = p
+        if mode == 'leafs':
+            p_val_u_test = [bac_p for bac_p in all_ps.values()]
+            rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(p_val_u_test), method="bonferroni")
+            for e, tax in enumerate(all_ps.keys()):
+                if corrected_p_values_r[e] < threshold_p:
+                    dict_ps[tax] = corrected_p_values_r[e]
+                    all_ps[tax] = corrected_p_values_r[e]
+                else:
+                    try:
+                        # we used 'try' because there is leafs that are not specices and didnt added to the dict at first, so it doesnt exist in the dict
+                        # the leaf is not significant so we are giving it a p-value of 0.06
+                        all_ps[tax] = 0.06
+                        del dict_ps[tax]
+                    except:
+                        pass
 
     binary_rec_by_pval(different_tax_in_level, eval, sis)
 
     if correct_first:
+        # pd.set_option('display.float_format', '{:.50f}'.format)
+
         all_ps_df = pd.Series(all_ps)
         all_ps_df = all_ps_df.to_frame()
+
         all_ps_df["len"] = [len(i.split(";")) for i in all_ps_df.index]
         all_ps_df["s"] = pd.Series(all_stat)
+
         to_test = all_ps_df[all_ps_df["len"] == start_i]
         if len(to_test.index) > 1:
             rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(to_test[0].values),
                                                                        method="bonferroni")
             to_test[0] = corrected_p_values_r
-            to_throw = to_test[to_test[0] > 0.05]
+            to_throw = to_test[to_test[0] > threshold_p]
             all_ps_df.loc[to_test.index, 0] = corrected_p_values_r.tolist()
 
     if mode == "plot":
@@ -593,28 +778,28 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
                 # If it doesn't exist, create the directory
                 os.makedirs(directory)
 
-            # Plot histograms of all different taxonomy levels (1)
-            mpl.rc('font', family='Times New Roman')
+            # Histograms of all different taxonomy levels plot (3)
+            mpl.rc('font', family='DejaVu Sans')
             SIZE = 15
-            df_hists = pd.DataFrame(columns=[1, 2, 3, 4, 5, 6, 7])
-            column_labels = [1, 2, 3, 4, 5, 6, 7]
+            column_labels = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species']
+
+            df_hists = pd.DataFrame(columns=column_labels)
             line_styles = ['-', '--', '-.', ':', '-', '--', '-.']
             line_widths = [1, 1.5, 2, 1, 1.5, 2, 1]
             fig, ax = plt.subplots(figsize=(12, 4))
-            df_hists[1] = img_arrays[:, 1, :].flatten()
-            df_hists[2] = img_arrays[:, 2, :].flatten()
-            df_hists[3] = img_arrays[:, 3, :].flatten()
-            df_hists[4] = img_arrays[:, 4, :].flatten()
-            df_hists[5] = img_arrays[:, 5, :].flatten()
-            df_hists[6] = img_arrays[:, 6, :].flatten()
-            df_hists[7] = img_arrays[:, 7, :].flatten()
+            df_hists['Kingdom'] = img_arrays[:, 1, :].flatten()
+            df_hists['Phylum'] = img_arrays[:, 2, :].flatten()
+            df_hists['Class'] = img_arrays[:, 3, :].flatten()
+            df_hists['Order'] = img_arrays[:, 4, :].flatten()
+            df_hists['Family'] = img_arrays[:, 5, :].flatten()
+            df_hists['Genus'] = img_arrays[:, 6, :].flatten()
+            df_hists['Species'] = img_arrays[:, 7, :].flatten()
             stds = df_hists.std()
             means = df_hists.mean()
             for i, col_label in enumerate(column_labels):
                 df_hists[col_label].plot.density(color="k", alpha=0.9, label=str(col_label), linestyle=line_styles[i],
                                                  linewidth=line_widths[i],
                                                  ax=ax)
-                print(f"Taxonomy {col_label}")
                 print(stats.kstest(df_hists[col_label], 'norm', args=(means.iloc[i], stds.iloc[i])))
 
             plt.legend(fontsize=15)
@@ -627,47 +812,125 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             plt.savefig(f"{directory}/hist.png")
             plt.show(block=False)
 
-            # Plot interacrions plot (2)
-            build_interactions(all_ps_df, bact_names_df, img_arrays, directory)
+            # Plot correlations within family (4)
 
-            # Plot correlations within family (3)
             imgs_p, imgs_s = build_img_from_table(all_ps_df, 0, "s", bact_names_df)
 
+            df_corss = pd.read_pickle("df_corrs.pkl")
+            pd.set_option('display.float_format', '{:.50f}'.format)
+
+            for df_corr_name in enumerate(df_corss.index):
+                df_corr_name = df_corr_name[1]
+                cell_col = []
+                len_name_dfcorr = len(df_corr_name.split(";"))
+                cell_row = bact_names_df.iloc[len_name_dfcorr]
+                for col_index, value in enumerate(cell_row):
+                    if df_corr_name in value:
+                        cell_col = col_index
+                        break
+
+                imgs_p[len_name_dfcorr, cell_col] = df_corss.loc[df_corr_name, "p"]
+                imgs_s[len_name_dfcorr, cell_col] = df_corss.loc[df_corr_name, "scc"]
+
             # check family test
-            mpl.rc('font', family='Times New Roman')
+            mpl.rc('font', family='DejaVu Sans')
+
+            all_leafs_in_df_corss = df_corss.index
             list_of_families = bact_names[5]
-            uniques = list(set(bact_names[5]))
+            uniques = list(set(list_of_families))
+            uniques = [item for item in uniques if any(char.isalpha() for char in item)]
             dict_pos = dict()
             dict_neg = dict()
             for f in uniques:
-                f_indexes = [i for i, value in enumerate(list_of_families) if value == f]
-                all_children = imgs_s[6:, f_indexes]
-                non_zero = all_children.sum().sum()
-                if non_zero != 0.0:
-                    negatives = (all_children < 0.0).sum()
-                    positives = (all_children > 0.0).sum()
-                    dict_pos[f] = positives
-                    dict_neg[f] = negatives
+                pos_count = 0
+                neg_count = 0
+                # checking if the family is in the df_corss
+                family_in_df_corss = next((1 for leaf in all_leafs_in_df_corss if f in leaf), None)
+                if family_in_df_corss != 1:
+                    continue
 
+                for leaf in all_leafs_in_df_corss:
+                    if f in leaf:
+                        p_leaf = df_corss.loc[leaf, "p"]
+                        if p_leaf < threshold_p:
+                            score = df_corss.loc[leaf, 'scc']
+                            if score > 0:
+                                pos_count += 1
+                            if score < 0:
+                                neg_count += 1
+                if pos_count == 0 and neg_count == 0:
+                    continue
+                dict_pos[f] = pos_count
+                dict_neg[f] = neg_count
+
+        flag = False
+        if not dict_pos and not dict_neg:
+            flag = True
+            print("miMic did not find significant families.")
+        else:
             df_to_plot = pd.DataFrame(index=list(dict_pos.keys()), columns=['Positives', 'Negatives'])
             df_to_plot['Positives'] = list(dict_pos.values())
             df_to_plot['Negatives'] = list(dict_neg.values())
             df_to_plot.index = [i.split(";")[-1] for i in df_to_plot.index]
-            df_to_plot.plot(kind="barh", color=["blue", "red"], figsize=(4, 4))
+            cmap_tab10 = cm.get_cmap('Set2')
+            cmap_set1 = cm.get_cmap('Set3')
+
+            # Get the list of color names from the colormaps
+            colors_tab10 = [cm.colors.to_rgba(color) for color in cmap_tab10.colors]
+            colors_set1 = [cm.colors.to_rgba(color) for color in cmap_set1.colors]
+
+            # Concatenate the color names from both colormaps
+            extended_colors = colors_tab10 + colors_set1
+
+            # Create a dictionary to store the color for each family
+            family_colors = {}
+
+            # Iterate over unique families and assign colors
+            unique_families = df_to_plot.index
+            # num_families = len(unique_families)
+            for i, family in enumerate(unique_families):
+                # Use modulo to cycle through the extended color list
+                rgba_color = extended_colors[i % len(extended_colors)]
+                # Convert RGBA color to tuple and store it in the dictionary
+                family_colors[family] = tuple(rgba_color)
+
+            # Plot the DataFrame
+            ax = df_to_plot.plot(kind="barh", color=['blue', 'red'], figsize=(4, 4))
+
+            # Customize the plot
+            num_families = len(df_to_plot.index)
+            fig = plt.gcf()
+            fig_height = max(5, num_families * 0.5)  # Minimum height of 5 inches, adjust multiplier as needed
+
+            if flag == True or colorful != True:
+                family_colors = None
+            # Set the size of the current figure
+            fig.set_size_inches(8, fig_height)
             plt.xlabel("Number", fontsize=SIZE)
             plt.xticks(fontsize=SIZE)
-            plt.yticks(fontsize=SIZE)
+            plt.yticks(range(len(df_to_plot.index)), df_to_plot.index, fontsize=SIZE)
+            if family_colors:
+                for label in ax.get_yticklabels():
+                    label.set_color(family_colors[label.get_text()])  # Set color based on family name
             plt.tight_layout()
             plt.savefig(f"{directory}/corrs_within_family.png")
             plt.show(block=False)
 
+            # Interactions plot (5)
+            build_interactions(bact_names_df, img_arrays, directory, family_colors,threshold_p=threshold_p)
+
             # Plot correlations on tree
-            creare_tree_view(bact_names, imgs_p, imgs_s, directory)
+            if flag == True or colorful != True:
+                family_colors = None
+            # Correlations on the tree Plot (6)
+            creare_tree_view(bact_names, imgs_p, imgs_s, directory, threshold_p, family_colors)
 
     series_corrs = pd.Series(dict_corrs).to_frame("scc")
     series_ps = pd.Series(dict_ps).to_frame("p")
     df_corrs = pd.concat([series_corrs, series_ps], axis=1)
-    df_corrs.index = [i.split("_")[0] for i in df_corrs.index]
+    df_corrs.index = [i.split("_")[0] if len(i.rsplit("_", maxsplit=1)) == 2 and i.split("_")[1].isdigit() else i for i
+                      in
+                      df_corrs.index]
     df_corrs = df_corrs.groupby(df_corrs.index).mean()
     if correct_first and start_i > 1:
         try:
@@ -706,7 +969,7 @@ def calculate_p_value(img_arrays, taxon, tag):
         return p_value
 
 
-def apply_nested_anova(folder, tag, mode="test", eval="man"):
+def apply_nested_anova(folder, tag, mode="test", eval="man", threshold_p=0.05):
     """
     Apply apriori nested test (ANOVA- for binary and categorical tags and GLM for continuous).
     :param folder: Folder where the images are saved (str).
@@ -717,6 +980,8 @@ def apply_nested_anova(folder, tag, mode="test", eval="man"):
     :return: In "test" mode returns the p-value, in "plot" mode returns a dataframe with the nested p-values
     of each taxonomy level.
     """
+    taxonomy_level = ['Anaerobic', 'Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species']
+
     img_arrays, bact_names, tag = load_from_folder(folder, tag)
     p_vals_df = pd.DataFrame(index=[1, 2, 3, 4, 5, 6, 7], columns=["nested-p"])
     if eval != "corr":
@@ -741,8 +1006,9 @@ def apply_nested_anova(folder, tag, mode="test", eval="man"):
             # print(anova_table)
             P = anova_table.iloc[taxon_lavel]["PR(>F)"]
             p_vals_df["nested-p"][taxon_lavel + 1] = P
-            if P < 0.05:
-                print(f"Test succeeded in level {taxon_lavel + 1}:P = {P}")
+            if P < threshold_p:
+                taxonomy = taxonomy_level[taxon_lavel]
+                print(f"Test succeeded in level {taxonomy}: P = {P}")
                 if mode == "test":
                     break
     else:
@@ -750,18 +1016,18 @@ def apply_nested_anova(folder, tag, mode="test", eval="man"):
         for taxon_lavel in range(img_arrays.shape[1]):
             P = calculate_p_value(img_arrays, taxon_lavel, tag)
             p_vals_df["nested-p"][taxon_lavel + 1] = P
-            if P < 0.05:
+            if P < threshold_p:
                 print(f"Test succeeded in level {taxon_lavel + 1}:P = {P}")
                 if mode == "test":
                     break
 
-    if mode == "test":
+    if mode == 'test':
         return P
     else:
         return p_vals_df
 
 
-def plot_rp_sp_anova_p(df, save):
+def plot_rp_sp_anova_p(df, mixed, save):
     """
     Plot RP vs SP over the different taxonomy levels and the p-values of the apriori test as function of taxonomy.
     :param df: RP and SP dataframe of the post hoc test applied (dataframe).
@@ -770,38 +1036,42 @@ def plot_rp_sp_anova_p(df, save):
     """
     TAX = 1
     SIZE = 15
-    mpl.rc('font', family='Times New Roman')
+    mpl.rc('font', family='DejaVu Sans')
+    taxonomy_level = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species', mixed]
+
+    # Assuming df is defined somewhere in your code
     real_sh = df[['RP', 'SP']]
 
-    # Create the first y-axis (bar plot)
-    ax1 = real_sh.plot(kind="bar", color=["blue", "red"], figsize=(4, 4), rot=0)
-    ax1.set_ylabel("Number of significants", fontsize=SIZE)
-    ax1.set_xlabel("Starting Taxonomy", fontsize=SIZE)
-    ax1.tick_params(axis="x", labelsize=SIZE)
-    ax1.tick_params(axis="y", labelsize=SIZE)
-    plt.legend(loc="upper center")
+    # Create the first y-axis (horizontal bar plot)
+    fig, ax1 = plt.subplots(figsize=(6, 4))  # Adjust the figure size as needed
+    real_sh.plot(kind="barh", color=["blue", "red"], ax=ax1)
+    ax1.set_xlabel("Number of significants (log scale)", fontsize=SIZE)  # Adjust the x-axis label
+    ax1.set_yticks(np.arange(len(taxonomy_level)))  # Set the y-ticks to match the custom labels
+    ax1.set_yticklabels(taxonomy_level, fontsize=SIZE)
+    ax1.set_ylabel("Starting Taxonomy", fontsize=SIZE)
+    ax1.tick_params(axis="both", labelsize=SIZE)
+    ax1.set_xscale('log')
 
     # Create a second y-axis (scatter plot)
-    ax2 = ax1.twinx()
-    # Set the y-ticks for ax2 to match df["nested ANOVA"] values
-    ax2.set_yticks([0, 5, 10, 15, 20, 25, 30])
-    ax2.set_ylabel("-log10(p-value)", fontsize=SIZE, color="green")  # Customize the label as needed
-    ax2.tick_params(axis="y", labelsize=SIZE, color="green")  # Adjust tick label font size
+    ax2 = ax1.twiny()
+    ax2.set_xticks([0, 5, 10, 15, 20, 25, 30])  # Adjust the ticks as needed
+    ax2.set_xlabel("-log10(p-value)", fontsize=SIZE, color="green")  # Customize the label as needed
+    ax2.tick_params(axis="both", labelsize=SIZE, color="green")  # Adjust tick label font size
     logged = df["nested-p"].apply(lambda x: -np.log10(x))
-    ax2.plot(ax1.get_xticks(), logged.values, linestyle="-", marker="o", markersize=5, color="green",
+    ax2.plot(logged.values, ax1.get_yticks(), linestyle="-", marker="o", markersize=5, color="green",
              label="Line Plot")
     logged_ = logged.values[TAX:]
 
-    ax2.plot(ax1.get_xticks()[TAX:], logged_, linestyle="-", marker="o",
-             markersize=5, color="grey",
-             )
+    ax2.plot(logged_, ax1.get_yticks()[TAX:], linestyle="-", marker="o",
+             markersize=5, color="grey")
 
+    # Tax vs RP SP ANOVA p plot (1)
     plt.tight_layout()
     plt.savefig(f"{save}/tax_vs_rp_sp_anova_p.png")
     plt.show(block=False)
 
 
-def calculate_rsp(df, tax, save):
+def calculate_rsp(df, save):
     """
     Calculate RSP score for different betas and create the appropriate plot.
     :param df: RP and SP dataframe of the post hoc test applied (dataframe).
@@ -809,17 +1079,22 @@ def calculate_rsp(df, tax, save):
     :param save: Name of folder to save the plot (str).
     :return: None. Display the RSP score as a function of beta.
     """
+
     list_beta = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9,
                  0.95, 1]
     to_plot = pd.DataFrame(index=list_beta, columns=["RSP"])
+    RP = df["RP"][8]
+    SP = df["SP"][8]
+    if RP == 0 and SP == 0:
+        print("miMic did not find RP on your Dataframe, please check the RP and SP terminal's outputs.")
+        return
+
     for beta in list_beta:
-        RP = df["RP"][tax]
-        SP = df["SP"][tax]
         to_plot["RSP"][beta] = (beta * RP - SP) / (beta * RP + SP)
 
-    # plot RSP vs beta
+    # RSP vs beta plot (2)
     SIZE = 15
-    mpl.rc('font', family='Times New Roman')
+    mpl.rc('font', family='DejaVu Sans')
     to_plot.plot(legend=False, figsize=(4, 4), color="grey")
     plt.ylim([0.5, 1.1])  # to_plot.min().values[0]-0.05
     plt.xlabel(r'$\beta$', fontsize=SIZE)
@@ -831,7 +1106,8 @@ def calculate_rsp(df, tax, save):
     plt.show(block=False)
 
 
-def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, mode="test", save=False, tax=None):
+def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, mode="test", save=False, tax=None,
+                colorful=True, threshold_p=0.05):
     """
     Apply the apriori ANOVA test and the post hoc test of miMic.
     :param folder: Folder path of the iMic images (str).
@@ -839,83 +1115,199 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
     :param eval: Evaluation method if the tag is binary - "man", if the tag is categorical -
         "category", if the tag is continuous - "corr" (str).
     :param sis: Determines whether to apply sister correction. One of "Bonferroni" or "No".
-    :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Bullian).
+    :param correct_first: Determines whether to apply FDR correction to the starting taxonomy (Boolean).
     :param mode: Mode of the miMic test - "test" or "plot" (str).
-    :param save: Determines whether to save the final corrS_df of the miMic test (Bullian).
+    :param save: Determines whether to save the final corrS_df of the miMic test (Boolean).
+    :param colorful: Determines whether to apply colorful mode to the miMic test (Boolean).
     :param tax: Starting taxonomy selected in the post hoc test (int).
     :return: If the apriori test is not significant, prints that and does not continue to the next step. If the
     apriori test is significant prints that and continues to the post hoc test. Prints the number of RPs found in each
     taxonomy level. At last if the the save variable is True it saves the df_corrs. It returns the selected starting taxonomy in the test mode.
     If the function is in "plot" mode it returns 6 plots.
     """
-    if mode == "test":
-        # Apply apriori nested ANOVA test
-        p = apply_nested_anova(folder, tag, mode=mode, eval=eval)
-        if p > 0.05:
-            print(f"Apriori nested ANOVA test is not significant, getting P = {p}.")
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        if mode == 'test':
 
-        else:
-            print(f"Apriori nested ANOVA test is significant.\nTrying postHC miMic test.")
+            print("\nApply nested Anova test")
+            p = apply_nested_anova(folder, tag, mode=mode, eval=eval, threshold_p=threshold_p)
+            if p > threshold_p:
+                print(f"Apriori nested ANOVA test is not significant, getting P = {p}.")
+                t1 = 'noAnova'
 
-            # Apply post HOC miMic test
-            for t in [1, 2, 3]:
-                print(f"Taxonomy is {t}")
-                df_corrs = calculate_all_imgs_tag_corr(folder, tag, t, eval=eval,
-                                                       sis=sis, correct_first=correct_first, mode=mode, shuffle=False)
-                df_corrs = df_corrs.dropna()
-                n_significant = (df_corrs["p"] < 0.05).sum()
-                print(f"Number of RP: {n_significant}")
-                if n_significant > 0:
-                    break
+            else:
+                print(f"Apriori nested ANOVA test is significant.\n\nTrying postHC miMic test.")
+                # Apply post HOC miMic test
+                print("Checking on the path starting from 1/2/3 taxonomy levels")
+                for t1 in [1, 2, 3]:
+                    print(f"\nTaxonomy is {t1}")
+                    df_corrs123 = calculate_all_imgs_tag_corr(folder, tag, t1, eval=eval,
+                                                              sis=sis, correct_first=correct_first, mode=mode,threshold_p=threshold_p,
+                                                              shuffle=False)
+                    df_corrs_123 = df_corrs123.dropna()
+                    n_significant = (df_corrs_123["p"] < threshold_p).sum()
+                    print(f"Number of RP: {n_significant}")
+                    if n_significant > 0:
+                        break
 
-                if t == 3:
-                    if n_significant == 0:
-                        print("Cannot find significant taxa by starting at 1 of the first 3 taxonomy levels :(")
+                    if t1 == 3:
+                        if n_significant == 0:
+                            print(
+                                "miMic did not find significant taxa by starting at 1 of the first 3 taxonomy levels.")
+                            t1 = 'noAnova'
 
+            print("\nTesting on the Leafs:")
+            df_corrs_leafs = calculate_all_imgs_tag_corr(folder, tag, 0, eval=eval,
+                                                         sis=sis, correct_first=correct_first, mode='leafs',threshold_p=threshold_p,
+                                                         shuffle=False)
+            df_corrs_leafs = df_corrs_leafs.dropna()
+            n_significant = (df_corrs_leafs["p"] < threshold_p).sum()
+            print(f"Number of RP: {n_significant}\n")
+            if n_significant == 0:
+                print("miMic did not find any significant taxa on the leafs.\n")
+                # if we did not find any significant taxa in the leafs and also miMic test did not find anything as well, we will stop here.
+                if t1 == 'noAnova':
+                    t1 = 'nosignificant'
+                    return t1
+
+            corrected_list_names = create_list_of_names(df_corrs_leafs.index)
+            original_list_names = df_corrs_leafs.index
+
+            # drpoing leafs that have sons- not relevant
+            for i, corrected_name in zip(original_list_names, corrected_list_names):
+                if any(name.startswith(corrected_name) for name in corrected_list_names if name != corrected_name):
+                    df_corrs_leafs = df_corrs_leafs.drop(i)
+
+            df_corrs = pd.concat([df_corrs_123, df_corrs_leafs])
+            df_corrs = df_corrs[~df_corrs.index.duplicated(keep='first')]
+
+            common_rows = pd.merge(df_corrs_leafs, df_corrs_123, how='inner', left_index=True, right_index=True)
+
+            # Subtract the common rows from df_corrs_leafs
+            df_corrs_leafs_difference = df_corrs_leafs[~df_corrs_leafs.index.isin(common_rows.index)]
+            df_corrs_leafs_difference.to_pickle("u_test_without_mimic.pkl")
+            df_corrs.to_pickle("df_corrs.pkl")
+
+            df_corrs123.to_csv(f"{folder}/just_mimic.csv")
             # save statistic and p-values df
             if save:
                 df_corrs.to_csv(f"{folder}/df_corrs.csv")
-            return t
+                df_corrs_leafs_difference.to_csv(f"{folder}/u_test_without_mimic.csv")
+
+            return t1
 
 
-    elif mode == "plot":
-        # Apply apriori nested ANOVA test
-        p_vals_df = apply_nested_anova(folder, tag, mode=mode)
+        elif mode == "plot":
+            # tax= the taxonomy level that miMic test choose to start from
+            if tax != 'nosignificant':
+                taxonomy_level = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species']
+                if tax != 'noAnova':
+                    mixed = taxonomy_level[tax - 1] + ' & leafs'
+                else:
+                    mixed = 'leafs'
+                # Apply apriori nested ANOVA test
+                p_vals_df = apply_nested_anova(folder, tag, mode=mode, threshold_p=threshold_p)
+                num_s_df = pd.DataFrame(index=[1, 2, 3, 4, 5, 6, 7, 8], columns=["RP", "SP"])
 
-        # Apply post HOC miMic test
-        num_s_df = pd.DataFrame(index=[1, 2, 3, 4, 5, 6, 7], columns=["RP", "SP"])
-        for t in [1, 2, 3, 4, 5, 6, 7]:
-            print(f"Taxonomy is {t}")
-            df_corrs_real = calculate_all_imgs_tag_corr(folder, tag, t, eval=eval,
-                                                        sis=sis, correct_first=correct_first, mode="test",
-                                                        shuffle=False)
+                # RP
+                bact_name_level = {}
+                non_common_count_RP = 0
 
-            df_corrs_real = df_corrs_real.dropna()
-            n_significant = (df_corrs_real["p"] < 0.05).sum()
-            num_s_df["RP"][t] = n_significant
-            print(f"Number of RP: {n_significant}")
+                # Apply post HOC miMic test
+                print("\nRP - post HOC mimic on original and addition \n")
+                for t in [1, 2, 3, 4, 5, 6, 7, 8]:
 
-        for t in [1, 2, 3, 4, 5, 6, 7]:
-            print(f"Taxonomy is {t}")
-            df_corrs_shuffled = calculate_all_imgs_tag_corr(folder, tag, t, eval=eval,
-                                                            sis=sis, correct_first=correct_first, mode="test",
-                                                            shuffle=True)
-            df_corrs_shuffled = df_corrs_shuffled.dropna()
-            n_significant_s = (df_corrs_shuffled["p"] < 0.05).sum()
-            num_s_df["SP"][t] = n_significant_s
-            print(f"Number of SP: {n_significant_s}")
+                    if t == 8:
+                        print("\nleafs")
+                        # check leafs test
+                        df_corrs_real = calculate_all_imgs_tag_corr(folder, tag, 0, eval=eval,
+                                                                    sis=sis, correct_first=correct_first, mode="leafs",threshold_p=threshold_p,
+                                                                    shuffle=False)
+                        df_corrs_real = df_corrs_real.dropna()
+                        n_significant = (df_corrs_real["p"] < threshold_p).sum()
+                        num_s_df["RP"][t] = n_significant
+                        print(f"Number of RP on leafs: {n_significant}\n")
 
-        # Build a common table for RP, SP, and nested ANOVA p-values
-        results_to_plot = pd.concat([num_s_df, p_vals_df], axis=1)
-        if not os.path.exists("plots"):
-            # If it doesn't exist, create the directory
-            os.makedirs("plots")
-        # Plot RP, SP, ANOVA vs taxonomy
-        plot_rp_sp_anova_p(results_to_plot, "plots")
-        # Plot RSP(beta) vs beta
-        calculate_rsp(num_s_df, tax, "plots")
-        # Plot inside plots on the taxonomy selected
-        calculate_all_imgs_tag_corr(folder, tag, tax, eval=eval,
-                                    sis=sis, correct_first=correct_first, mode="plot", shuffle=False)
+                        name_real_leafs = {index for index, row in df_corrs_real.iterrows() if row['p'] < threshold_p}
 
-        c = 0
+                        # if anova did not find any significant level
+                        if tax == 'noAnova':
+                            non_common_count_RP = len(set(name_real_leafs))
+
+                        else:
+                            non_common_count_RP = len(set(name_real_leafs) | set(bact_name_level[tax]))
+
+                        continue
+
+                    print(f"\nTaxonomy is {t}")
+                    df_corrs_real = calculate_all_imgs_tag_corr(folder, tag, t, eval=eval,
+                                                                sis=sis, correct_first=correct_first, mode="test",threshold_p=threshold_p,
+                                                                shuffle=False)
+                    df_corrs_real = df_corrs_real.dropna()
+                    n_significant = (df_corrs_real["p"] < threshold_p).sum()
+                    num_s_df["RP"][t] = n_significant
+                    print(f"Number of RP: {n_significant}")
+
+                    if t == tax:
+                        names_original_real = {index for index, row in df_corrs_real.iterrows() if
+                                               row['p'] < threshold_p}
+                        bact_name_level[t] = names_original_real
+
+                # SP
+                bact_name_level_shuffle = {}
+                non_common_count_SP = 0
+                print("\nSP - post HOC mimic on original and addition \n")
+
+                for t in [1, 2, 3, 4, 5, 6, 7, 8]:
+
+                    if t == 8:
+                        print("\nleafs")
+                        # check leafs test
+                        df_corrs_shuffled = calculate_all_imgs_tag_corr(folder, tag, 0, eval=eval,
+                                                                        sis=sis, correct_first=correct_first,
+                                                                        mode="leafs",threshold_p=threshold_p,
+                                                                        shuffle=True)
+                        df_corrs_shuffled = df_corrs_shuffled.dropna()
+                        n_significant = (df_corrs_shuffled["p"] < threshold_p).sum()
+                        num_s_df["SP"][t] = n_significant
+                        print(f"Number of SP on leafs: {n_significant}\n")
+
+                        name_shuffle_leafs = {index for index, row in df_corrs_shuffled.iterrows() if row['p'] < threshold_p}
+                        if tax == 'noAnova':
+                            non_common_count_SP = len(set(name_shuffle_leafs))
+                        else:
+                            non_common_count_SP = len(set(name_shuffle_leafs) | set(bact_name_level_shuffle[tax]))
+
+                        continue
+
+                    print(f"\nTaxonomy is {t}")
+                    df_corrs_shuffled = calculate_all_imgs_tag_corr(folder, tag, t, eval=eval,
+                                                                    sis=sis, correct_first=correct_first, mode="test",threshold_p=threshold_p,
+                                                                    shuffle=True)
+                    df_corrs_shuffled = df_corrs_shuffled.dropna()
+                    n_significant = (df_corrs_shuffled["p"] < threshold_p).sum()
+                    num_s_df["SP"][t] = n_significant
+                    print(f"Number of SP: {n_significant}")
+
+                    if t == tax:
+                        names_addition_shuffle = {index for index, row in df_corrs_shuffled.iterrows() if
+                                                  row['p'] < threshold_p}
+                        bact_name_level_shuffle[t] = names_addition_shuffle
+
+                num_s_df['RP'][8] = non_common_count_RP
+                num_s_df['SP'][8] = non_common_count_SP
+                print(f"{mixed}:\nRP: {num_s_df['RP'][8]}\nSP: {num_s_df['SP'][8]}\n")
+
+                # Build a common table for RP, SP, and nested ANOVA p-values
+                results_to_plot = pd.concat([num_s_df, p_vals_df], axis=1)
+                if not os.path.exists("plots"):
+                    # If it doesn't exist, create the directory
+                    os.makedirs("plots")
+                # Plot RP, SP, ANOVA vs taxonomy
+                plot_rp_sp_anova_p(results_to_plot, mixed, save="plots")
+                # Plot RSP(beta) vs beta
+                calculate_rsp(num_s_df, "plots")
+                # Plot inside plots on the taxonomy selected
+                calculate_all_imgs_tag_corr(folder, tag, tax, eval=eval,
+                                            sis=sis, correct_first=correct_first, mode="plot",threshold_p=threshold_p, shuffle=False,
+                                            colorful=colorful)

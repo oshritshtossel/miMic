@@ -21,8 +21,7 @@ if __name__ == '__main__':
     samba.micro2matrix(processed, folder, save=True)
 
     # Apply miMic test
-    taxonomy_selected = apply_mimic(folder, tag, eval="man")
+    taxonomy_selected = apply_mimic(folder, tag, eval="man",threshold_p=0.05)
     if taxonomy_selected is not None:
-        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", save=False)
+        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", save=False,threshold_p=0.05)
 
-    c = 0
