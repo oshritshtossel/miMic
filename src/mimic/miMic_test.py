@@ -112,22 +112,22 @@ def create_list_of_names(list_leaves):
     for i, j in zip(list_leaves, list_lens):
         parts = i.rsplit("_", maxsplit=1)
         flag = False
-        if parts == 2:
+        if len(parts) == 2:
             flag = True
         if j == 1:
-            if flag and parts[2].isdigit():
+            if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0].split("_")[0]
             else:
                 updated = "k__" + i.split(";")[0]
 
         elif j == 2:
-            if flag and parts[2].isdigit():
+            if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1].split("_")[0]
             else:
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1]
 
         elif j == 3:
-            if flag and parts[2].isdigit():
+            if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
                           i.split(";")[2].split("_")[
                               0]
@@ -135,7 +135,7 @@ def create_list_of_names(list_leaves):
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
                           i.split(";")[2]
         elif j == 4:
-            if flag and parts[2].isdigit():
+            if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3].split("_")[0]
 
@@ -144,7 +144,7 @@ def create_list_of_names(list_leaves):
                     2] + ";" + "o__" + i.split(";")[3]
 
         elif j == 5:
-            if flag and parts[2].isdigit():
+            if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4].split("_")[0]
             else:
@@ -152,7 +152,7 @@ def create_list_of_names(list_leaves):
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4]
 
         elif j == 6:
-            if flag and parts[2].isdigit():
+            if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
                           i.split(";")[5].split("_")[0]
@@ -162,7 +162,7 @@ def create_list_of_names(list_leaves):
                           i.split(";")[5]
 
         elif j == 7:
-            if flag and parts[2].isdigit():
+            if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
                               5] + ";" + "s__" + i.split(";")[6].split("_")[0]
@@ -1181,7 +1181,6 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
             if t1!='noAnova':
                 df_corrs = pd.concat([df_corrs_123, df_corrs_leafs])
                 df_corrs = df_corrs[~df_corrs.index.duplicated(keep='first')]
-
                 common_rows = pd.merge(df_corrs_leafs, df_corrs_123, how='inner', left_index=True, right_index=True)
 
                 # Subtract the common rows from df_corrs_leafs
@@ -1195,9 +1194,10 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
                     df_corrs.to_csv(f"{folder}/df_corrs.csv")
                     df_corrs_leafs_difference.to_csv(f"{folder}/u_test_without_mimic.csv")
             else:
+                df_corrs_leafs.to_pickle("u_test_without_mimic.pkl")
                 df_corrs_leafs.to_pickle("df_corrs.pkl")
                 if save:
-                    df_corrs_leafs.to_csv(f"{folder}/df_corrs.csv")
+                    df_corrs_leafs.to_csv(f"{folder}/u_test_without_mimic.csv")
 
             return t1
 
