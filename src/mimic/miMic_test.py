@@ -103,6 +103,7 @@ def build_img_from_table(table, col1, col2, names):
 
 def create_list_of_names(list_leaves):
     """
+
     Fix taxa names for tree plot.
     :param list_leaves: List of leaves names without the initials (list).
     :return: Corrected list taxa names.
@@ -116,28 +117,27 @@ def create_list_of_names(list_leaves):
             flag = True
         if j == 1:
             if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0].split("_")[0]
+                updated = "k__" + parts[0].split(";")[-1]
             else:
                 updated = "k__" + i.split(";")[0]
 
         elif j == 2:
             if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1].split("_")[0]
+                updated = "k__" + i.split(";")[0] + ";" + "p__" + parts[0].split(";")[-1]
             else:
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1]
 
         elif j == 3:
             if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
-                          i.split(";")[2].split("_")[
-                              0]
+                          parts[0].split(";")[-1]
             else:
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
                           i.split(";")[2]
         elif j == 4:
             if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3].split("_")[0]
+                    2] + ";" + "o__" + parts[0].split(";")[-1]
 
             else:
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
@@ -146,7 +146,7 @@ def create_list_of_names(list_leaves):
         elif j == 5:
             if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4].split("_")[0]
+                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + parts[0].split(";")[-1]
             else:
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4]
@@ -155,7 +155,7 @@ def create_list_of_names(list_leaves):
             if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
-                          i.split(";")[5].split("_")[0]
+                          parts[0].split(";")[-1]
             else:
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
@@ -165,7 +165,7 @@ def create_list_of_names(list_leaves):
             if flag and parts[1].isdigit():
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
-                              5] + ";" + "s__" + i.split(";")[6].split("_")[0]
+                              5] + ";" + "s__" + parts[0].split(";")[-1]
             else:
                 updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
                     2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
@@ -209,11 +209,14 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
     """
     T = ete3.PhyloTree()
     u_test = pd.read_pickle("u_test_without_mimic.pkl")
-
+    flag_check_exist = False
+    try:
+        mimic_and_utest= pd.read_pickle("miMic&Utest.pkl")
+        flag_check_exist = True
+    except:
+        mimic_and_utest= None
     # Get the number of rows and columns in the ndarray
     num_rows, num_cols = names.shape
-
-    # Create an empty list to store the first non-empty cell for each column
     first_non_empty_cells = [None] * num_cols
 
     # first_non_empty_cells will store all the leafs
@@ -226,19 +229,23 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
             contains_letter = any(char.isalpha() for char in names[row_idx, col_idx])
             if not contains_letter:
                 continue
+            if 'k__Bacteria;p__Actinobacteria;c__Actinomycetia;o__Corynebacteriales;f__Nocardiaceae;g__Rhodococcus' in \
+                    names[row_idx, col_idx]:
+                c = 0
             # If the current cell is not empty, update the first non-empty cell for this column
             if first_non_empty_cells[col_idx] is None:
                 if mean_0[row_idx, col_idx] < threshold_p and mean_0[row_idx, col_idx] != 0.0:
                     flag = True
                     first_non_empty_cells[col_idx] = names[row_idx, col_idx]
+                    names[row_idx, col_idx]= names[row_idx,col_idx].rsplit('_',maxsplit=1)[0]
                 if flag == False:
                     first_non_empty_cells[col_idx] = '0.0'
                 break
 
     # removing all the leafs that are not significant, those labeled with 0.0
     first_non_empty_cells = [cell for cell in first_non_empty_cells if cell != '0.0']
-    otu_train_cols = create_list_of_names(first_non_empty_cells)
 
+    otu_train_cols = create_list_of_names(first_non_empty_cells)
     g = create_tax_tree(pd.Series(index=otu_train_cols))
     epsilon = 1e-1000
     root = list(filter(lambda p: p[1] == 0, g.in_degree))[0][0]
@@ -253,11 +260,11 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
 
             # for u test without mimic results the name is fixed to the correct version of the taxonomy
             # for the mimic results the name is the actual name
-            name_actual_cell = find_actual_name(';'.join(s[0]), first_non_empty_cells)
-            if name_actual_cell is not None:
-                actual_name = name_actual_cell
-            else:
-                actual_name = ';'.join(s[0])
+            u_test_name = create_list_of_names([(';'.join(s[0]))])[0]
+
+            if u_test_name == 'k__Bacteria;p__Actinobacteria;c__Actinomycetia;o__Bifidobacteriales;f__Bifidobacteriaceae;g__Bifidobacterium;s__Bifidobacterium_longum':
+                c = 0
+            actual_name = ";".join(s[0])
 
             if s[0][-1] not in T or not any([anc.species == a for anc, a in
                                              zip(T.search_nodes(name=s[0][-1])[0].get_ancestors()[:-1],
@@ -266,8 +273,34 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
                 if len(s[0]) != 1:
                     t = T.search_nodes(full_name=s[0][:-1])[0]
 
+                if flag_check_exist:
+                    mimic_and_utest_index = mimic_and_utest.index[mimic_and_utest.index.isin([u_test_name])]
+                    if mimic_and_utest_index != None:
+                        t = t.add_child(name=s[0][-1])
+                        t.species = s[0][-1]
+                        t.add_feature("full_name", s[0])
+                        t.add_feature("max_0_grad", -np.log10(mimic_and_utest.loc[mimic_and_utest_index]['p'].iloc[0] + epsilon))
+                        t.add_feature("max_1_grad", mimic_and_utest.loc[mimic_and_utest_index]['scc'].iloc[0])
+                        t.add_feature("max_2_grad", mimic_and_utest.loc[mimic_and_utest_index]['p'].iloc[0])
+                        t.add_feature("shape", "sphere")
+
+                        # if the name is including family level, we will set the family color
+                        if family_colors != None:
+                            split_name = str(mimic_and_utest_index[0]).split(';')
+                            if len(split_name) >= 5:
+                                family_name = split_name[4].split('__')[1]
+                                family_color = family_colors.get(family_name, "nocolor")
+                            else:
+                                # if the name is not including family level, we will not set a family color
+                                family_color = "nocolor"
+                            t.add_feature("family_color", family_color)
+
+                        continue
+
+
+
                 # taking the node index, if the node is in u_test (without mimic results)
-                in_utest_index = u_test.index[u_test.index.isin([";".join(s[0])])]
+                in_utest_index = u_test.index[u_test.index.isin([u_test_name])]
                 if in_utest_index != None:
 
                     t = t.add_child(name=s[0][-1])
@@ -276,12 +309,14 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
                     t.add_feature("max_0_grad", -np.log10(u_test.loc[in_utest_index]['p'].iloc[0] + epsilon))
                     t.add_feature("max_1_grad", u_test.loc[in_utest_index]['scc'].iloc[0])
                     t.add_feature("max_2_grad", u_test.loc[in_utest_index]['p'].iloc[0])
+                    t.add_feature("shape", "square")
 
                     # if the name is including family level, we will set the family color
                     if family_colors != None:
                         split_name = str(in_utest_index[0]).split(';')
                         if len(split_name) >= 5:
-                            family_color = family_colors.get(split_name[4], "nocolor")
+                            family_name = split_name[4].split('__')[1]
+                            family_color = family_colors.get(family_name, "nocolor")
                         else:
                             # if the name is not including family level, we will not set a family color
                             family_color = "nocolor"
@@ -290,18 +325,20 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
                     continue
 
                 # nodes in mimic results without u-test
+
                 t = t.add_child(name=s[0][-1])
                 t.species = s[0][-1]
                 t.add_feature("full_name", s[0])
                 t.add_feature("max_0_grad", -np.log10(mean_0[names == actual_name].mean() + epsilon))
                 t.add_feature("max_1_grad", mean_1[names == actual_name].mean())
                 t.add_feature("max_2_grad", mean_0[names == actual_name].mean())
+                t.add_feature("shape", "circle")
 
                 if family_colors != None:
                     # setting the family color
                     split_name = actual_name.split(';')
                     if len(split_name) >= 5:
-                        family_color = family_colors.get(split_name[4], "nocolor")
+                        family_color = family_colors.get(actual_name.split(';')[4], "nocolor")
                     else:
                         family_color = "nocolor"
                     t.add_feature("family_color", family_color)
@@ -313,13 +350,19 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
         nstyle["size"] = 20
         nstyle["fgcolor"] = "gray"
         name = ";".join(t.full_name)
-
+        if name == "Bacteria;Actinobacteria;Actinomycetia;Bifidobacteriales;Bifidobacteriaceae;Bifidobacterium;Bifidobacterium_longum" or name == 'Bacteria;Actinobacteria;Coriobacteriia;Coriobacteriales;Coriobacteriaceae;Collinsella;Collinsella_SGB4121':
+            c = 0
         if (t.max_1_grad > bound_0) and (t.max_2_grad < threshold_p):
             nstyle["fgcolor"] = "blue"
             nstyle["size"] = t.max_0_grad * 15
 
-            if name in u_test.index and len(name.split(';')) == 7:
+            if t.shape == "square":
                 nstyle["shape"] = "square"
+
+            if t.shape == "sphere":
+                nstyle["shape"] = "sphere"
+            if t.shape == "circle":
+                nstyle["shape"] = "circle"
 
             if family_colors != None:
                 if t.family_color != "nocolor":
@@ -331,8 +374,12 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
             nstyle["fgcolor"] = "red"
             nstyle["size"] = t.max_0_grad * 15
 
-            if name in u_test.index and len(name.split(';')) == 7:
+            if t.shape == "square":
                 nstyle["shape"] = "square"
+            if t.shape == "sphere":
+                nstyle["shape"] = "sphere"
+            if t.shape == "circle":
+                nstyle["shape"] = "circle"
 
             if family_colors != None:
                 if t.family_color != "nocolor":
@@ -354,10 +401,10 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
 
     for node in T0.get_descendants():
         if node.is_leaf():
-            name = node.name.replace('_', '').capitalize()
+            name = node.name.replace('_', ' ').capitalize()
             name = "".join([i for i in name if not i.isdigit()])
             if name == "":
-                name = node.get_ancestors()[0].name.replace("_", "").capitalize()
+                name = node.get_ancestors()[0].name.replace("_", " ").capitalize()
                 name = "".join([i for i in name if not i.isdigit()])
             node.name = name
 
@@ -390,23 +437,29 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
         :return: None
         """
         if node.is_leaf():
-            try:
-                tax = D[len(node.full_name)]
-                if len(node.full_name) == 7:
-                    name = node.up.name.replace("[", "").replace("]", "") + " " + node.name.lower()
-                else:
-                    name = node.name
-                F = TextFace(f"{name} {tax} ", fsize=100, ftype="Arial")  # {tax}
-                add_face_to_node(F, node, column=0, position="branch-right")
-            except:
-                pass
+            tax = D[len(node.full_name)]
+            if len(node.full_name) == 7:
+                name = node.up.name.replace("[", "").replace("]", "") + " " + node.name.lower()
+            else:
+                name = node.name
+            F = TextFace(f"{name} {tax} ", fsize=100, ftype="Arial")  # {tax}
+            add_face_to_node(F, node, column=0, position="branch-right")
 
     ts.layout_fn = my_layout
     T0.show(tree_style=(ts))
     T0.render(f"{directory}/correlations_tree.png", tree_style=deepcopy(ts))
 
 
-def build_interactions(bact_names, img_array, save, family_colors,threshold_p=0.05, THRESHOLD=0.5):
+def convert_original(name):
+    components = name.split(";")
+
+    # Extract the names after the prefixes and join them with semicolons
+    formatted_string = ";".join(component.split("__")[1] for component in components if component)
+
+    return formatted_string
+
+
+def build_interactions(bact_names, img_array, save, family_colors, threshold_p=0.05, THRESHOLD=0.5):
     """
     Plot interaction network between the significant taxa founded by miMic, such that each node color
     is according to the sigh of the post hoc test with the tag, its shape is according to its order, and
@@ -431,17 +484,14 @@ def build_interactions(bact_names, img_array, save, family_colors,threshold_p=0.
 
     for pixel in only_significant.index:
         row = all_ps.loc[pixel]["len"]
+        pixel_o = convert_original(pixel)
         indexes = min(
-            [i for i, value in enumerate(bact_names.loc[row]) if value == pixel or value.split('_')[0] == pixel])
+            [i for i, value in enumerate(bact_names.loc[row]) if pixel_o == value.rsplit('_', maxsplit=1)[0]])
         df_index["index"][pixel] = indexes
     only_significant["index"] = df_index["index"]
     # only species
     only_significant = only_significant[only_significant["len"] == 7]
-    only_significant.index = [
-        node.replace("[", "").replace("]", "").replace(";_0", "").replace(";_1", "").replace(";_2", "").replace(";_3",
-                                                                                                                "").replace(
-            ";_4", "").replace(";_5", "").replace(";_6", "").replace(";_7", "").replace("_0", "") for node in
-        only_significant.index]
+
     only_significant["fixed_len"] = [len(i.split(";")) for i in only_significant.index]
     only_significant = only_significant[only_significant["fixed_len"] == 7]
     only_significant["size"] = -np.log10(only_significant['0']) * 30
@@ -499,7 +549,11 @@ def build_interactions(bact_names, img_array, save, family_colors,threshold_p=0.
 
     # Assign original names to the nodes
     for i, node in G.nodes(data=True):
-        node['name'] = numerical_to_original_names[i]
+        #numerical_to_original_names[i] is in the format of "g__X;s__Y"
+        parts= numerical_to_original_names[i].split(';')
+        g_part = parts[0].split('g__')[1] if 'g__' in parts[0] else ''
+        s_part = parts[1].split('s__')[1] if 's__' in parts[1] else ''
+        node['name'] = g_part+ ";" + s_part
 
     node_colors = {i: color for i, color in enumerate(only_significant['color'])}
     node_sizes = {i: size for i, size in enumerate(only_significant['size'])}
@@ -526,7 +580,6 @@ def build_interactions(bact_names, img_array, save, family_colors,threshold_p=0.
     # Add labels to nodes
     # Calculate positions for node labels on the periphery
     node_labels = {i: node['name'] for i, node in G.nodes(data=True)}
-
     # Calculate positions for node labels (vertical orientation)
     label_positions = {node: (pos[node][0], pos[node][1] + 0.01) for node in G.nodes()}
     description = nx.draw_networkx_labels(G, label_positions, labels=node_labels, font_size=10, font_color='black')
@@ -544,9 +597,11 @@ def build_interactions(bact_names, img_array, save, family_colors,threshold_p=0.
         t.set_clip_on(False)
 
         if family_colors:
+            node_name= create_list_of_names([("".join(node_labels[node]))])[0]
+            node_name= node_name.replace("k__", "g__").replace("p__", "s__")
             family_name = [i.split(';')[4] for i in inter_corr.index if
-                           node_labels[node] in i]
-            font_color = family_colors.get(family_name[0], "black")  # Default font color is black
+                           node_name in i]
+            font_color = family_colors.get(family_name[0].split('__')[1], "black")  # Default font color is black
             t.set_color(font_color)
 
     # Display the graph
@@ -723,7 +778,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
                 del sons_pv[min_son]
 
                 rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(sons_pv.values()),
-                                                                           method="bonferroni")
+                                                                           method="fdr_bh")
                 for e, son in enumerate(sons_pv):
                     if corrected_p_values_r[e] >= threshold_p:
                         for bact in [k for k in dict_ps.keys() if son in k]:
@@ -736,7 +791,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
 
         if mode == 'leafs':
             p_val_u_test = [bac_p for bac_p in all_ps.values()]
-            rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(p_val_u_test), method="bonferroni")
+            rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(p_val_u_test), method="fdr_bh")
             for e, tax in enumerate(all_ps.keys()):
                 if corrected_p_values_r[e] < threshold_p:
                     dict_ps[tax] = corrected_p_values_r[e]
@@ -764,7 +819,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
         to_test = all_ps_df[all_ps_df["len"] == start_i]
         if len(to_test.index) > 1:
             rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(to_test[0].values),
-                                                                       method="bonferroni")
+                                                                       method="fdr_bh")
             to_test[0] = corrected_p_values_r
             to_throw = to_test[to_test[0] > threshold_p]
             all_ps_df.loc[to_test.index, 0] = corrected_p_values_r.tolist()
@@ -820,12 +875,17 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             pd.set_option('display.float_format', '{:.50f}'.format)
 
             for df_corr_name in enumerate(df_corss.index):
+                if df_corr_name == 'k__Bacteria;p__Actinobacteria;c__Coriobacteriia;o__Eggerthellales;f__Eggerthellaceae;g__Slackia;s__Slackia_isoflavoniconvertens':
+                    c = 0
                 df_corr_name = df_corr_name[1]
+                if df_corr_name == 'k__Bacteria;p__Actinobacteria;c__Coriobacteriia;o__Eggerthellales;f__Eggerthellaceae;g__Slackia;s__Slackia_isoflavoniconvertens':
+                    c = 0
                 cell_col = []
                 len_name_dfcorr = len(df_corr_name.split(";"))
                 cell_row = bact_names_df.iloc[len_name_dfcorr]
                 for col_index, value in enumerate(cell_row):
-                    if df_corr_name in value:
+                    df_corr_name_o = convert_original(df_corr_name)
+                    if df_corr_name_o in value:
                         cell_col = col_index
                         break
 
@@ -836,18 +896,15 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             mpl.rc('font', family='DejaVu Sans')
 
             all_leafs_in_df_corss = df_corss.index
-            list_of_families = bact_names[5]
+            # taking all the families, if the length of the name is 5 = family
+            list_of_families = [';'.join(i.split(';')[:5]) for i in df_corss.index if len(i.split(';')) >= 5]
             uniques = list(set(list_of_families))
-            uniques = [item for item in uniques if any(char.isalpha() for char in item)]
             dict_pos = dict()
             dict_neg = dict()
             for f in uniques:
+
                 pos_count = 0
                 neg_count = 0
-                # checking if the family is in the df_corss
-                family_in_df_corss = next((1 for leaf in all_leafs_in_df_corss if f in leaf), None)
-                if family_in_df_corss != 1:
-                    continue
 
                 for leaf in all_leafs_in_df_corss:
                     if f in leaf:
@@ -860,6 +917,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
                                 neg_count += 1
                 if pos_count == 0 and neg_count == 0:
                     continue
+                f = f.split(";")[-1].split("__")[1]
                 dict_pos[f] = pos_count
                 dict_neg[f] = neg_count
 
@@ -917,7 +975,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis=None, cor
             plt.show(block=False)
 
             # Interactions plot (5)
-            build_interactions(bact_names_df, img_arrays, directory, family_colors,threshold_p=threshold_p)
+            build_interactions(bact_names_df, img_arrays, directory, family_colors, threshold_p=threshold_p)
 
             # Plot correlations on tree
             if flag == True or colorful != True:
@@ -1142,10 +1200,11 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
                 for t1 in [1, 2, 3]:
                     print(f"\nTaxonomy is {t1}")
                     df_corrs123 = calculate_all_imgs_tag_corr(folder, tag, t1, eval=eval,
-                                                              sis=sis, correct_first=correct_first, mode=mode,threshold_p=threshold_p,
+                                                              sis=sis, correct_first=correct_first, mode=mode,
+                                                              threshold_p=threshold_p,
                                                               shuffle=False)
-                    df_corrs_123 = df_corrs123.dropna()
-                    n_significant = (df_corrs_123["p"] < threshold_p).sum()
+                    df_corrs123 = df_corrs123.dropna()
+                    n_significant = (df_corrs123["p"] < threshold_p).sum()
                     print(f"Number of RP: {n_significant}")
                     if n_significant > 0:
                         break
@@ -1158,7 +1217,8 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
 
             print("\nTesting on the Leafs:")
             df_corrs_leafs = calculate_all_imgs_tag_corr(folder, tag, 0, eval=eval,
-                                                         sis=sis, correct_first=correct_first, mode='leafs',threshold_p=threshold_p,
+                                                         sis=sis, correct_first=correct_first, mode='leafs',
+                                                         threshold_p=threshold_p,
                                                          shuffle=False)
             df_corrs_leafs = df_corrs_leafs.dropna()
             n_significant = (df_corrs_leafs["p"] < threshold_p).sum()
@@ -1170,32 +1230,43 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
                     t1 = 'nosignificant'
                     return t1
 
+            df_corrs_leafs.index = create_list_of_names(df_corrs_leafs.index)
+
             corrected_list_names = create_list_of_names(df_corrs_leafs.index)
             original_list_names = df_corrs_leafs.index
 
-            # droping leafs that have sons- not relevant
+            # dropping leafs that have sons- not relevant
+
             for i, corrected_name in zip(original_list_names, corrected_list_names):
                 if any(name.startswith(corrected_name) for name in corrected_list_names if name != corrected_name):
                     df_corrs_leafs = df_corrs_leafs.drop(i)
 
-            if t1!='noAnova':
-                df_corrs = pd.concat([df_corrs_123, df_corrs_leafs])
+            if t1 != 'noAnova':
+                df_corrs123.index = create_list_of_names(df_corrs123.index)
+                df_corrs = pd.concat([df_corrs123, df_corrs_leafs])
                 df_corrs = df_corrs[~df_corrs.index.duplicated(keep='first')]
-                common_rows = pd.merge(df_corrs_leafs, df_corrs_123, how='inner', left_index=True, right_index=True)
+                common_rows = pd.merge(df_corrs_leafs, df_corrs123, how='inner', left_index=True, right_index=True)
 
+                mimic_and_utest= df_corrs[df_corrs.index.isin(common_rows.index)]
                 # Subtract the common rows from df_corrs_leafs
                 df_corrs_leafs_difference = df_corrs_leafs[~df_corrs_leafs.index.isin(common_rows.index)]
                 df_corrs_leafs_difference.to_pickle("u_test_without_mimic.pkl")
                 df_corrs.to_pickle("df_corrs.pkl")
+                mimic_and_utest.to_pickle("miMic&Utest.pkl")
 
-                df_corrs123.to_csv(f"{folder}/just_mimic.csv")
+
+
                 # save statistic and p-values df
                 if save:
                     df_corrs.to_csv(f"{folder}/df_corrs.csv")
                     df_corrs_leafs_difference.to_csv(f"{folder}/u_test_without_mimic.csv")
+                    df_corrs123.to_csv(f"{folder}/just_mimic.csv")
+                    mimic_and_utest.to_csv(f"{folder}/miMic&Utest.csv")
+
             else:
                 df_corrs_leafs.to_pickle("u_test_without_mimic.pkl")
                 df_corrs_leafs.to_pickle("df_corrs.pkl")
+
                 if save:
                     df_corrs_leafs.to_csv(f"{folder}/u_test_without_mimic.csv")
 
@@ -1226,7 +1297,8 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
                         print("\nleafs")
                         # check leafs test
                         df_corrs_real = calculate_all_imgs_tag_corr(folder, tag, 0, eval=eval,
-                                                                    sis=sis, correct_first=correct_first, mode="leafs",threshold_p=threshold_p,
+                                                                    sis=sis, correct_first=correct_first, mode="leafs",
+                                                                    threshold_p=threshold_p,
                                                                     shuffle=False)
                         df_corrs_real = df_corrs_real.dropna()
                         n_significant = (df_corrs_real["p"] < threshold_p).sum()
@@ -1246,7 +1318,8 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
 
                     print(f"\nTaxonomy is {t}")
                     df_corrs_real = calculate_all_imgs_tag_corr(folder, tag, t, eval=eval,
-                                                                sis=sis, correct_first=correct_first, mode="test",threshold_p=threshold_p,
+                                                                sis=sis, correct_first=correct_first, mode="test",
+                                                                threshold_p=threshold_p,
                                                                 shuffle=False)
                     df_corrs_real = df_corrs_real.dropna()
                     n_significant = (df_corrs_real["p"] < threshold_p).sum()
@@ -1270,14 +1343,15 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
                         # check leafs test
                         df_corrs_shuffled = calculate_all_imgs_tag_corr(folder, tag, 0, eval=eval,
                                                                         sis=sis, correct_first=correct_first,
-                                                                        mode="leafs",threshold_p=threshold_p,
+                                                                        mode="leafs", threshold_p=threshold_p,
                                                                         shuffle=True)
                         df_corrs_shuffled = df_corrs_shuffled.dropna()
                         n_significant = (df_corrs_shuffled["p"] < threshold_p).sum()
                         num_s_df["SP"][t] = n_significant
                         print(f"Number of SP on leafs: {n_significant}\n")
 
-                        name_shuffle_leafs = {index for index, row in df_corrs_shuffled.iterrows() if row['p'] < threshold_p}
+                        name_shuffle_leafs = {index for index, row in df_corrs_shuffled.iterrows() if
+                                              row['p'] < threshold_p}
                         if tax == 'noAnova':
                             non_common_count_SP = len(set(name_shuffle_leafs))
                         else:
@@ -1287,7 +1361,8 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
 
                     print(f"\nTaxonomy is {t}")
                     df_corrs_shuffled = calculate_all_imgs_tag_corr(folder, tag, t, eval=eval,
-                                                                    sis=sis, correct_first=correct_first, mode="test",threshold_p=threshold_p,
+                                                                    sis=sis, correct_first=correct_first, mode="test",
+                                                                    threshold_p=threshold_p,
                                                                     shuffle=True)
                     df_corrs_shuffled = df_corrs_shuffled.dropna()
                     n_significant = (df_corrs_shuffled["p"] < threshold_p).sum()
@@ -1314,5 +1389,11 @@ def apply_mimic(folder, tag, eval="man", sis="bonferroni", correct_first=True, m
                 calculate_rsp(num_s_df, "plots")
                 # Plot inside plots on the taxonomy selected
                 calculate_all_imgs_tag_corr(folder, tag, tax, eval=eval,
-                                            sis=sis, correct_first=correct_first, mode="plot",threshold_p=threshold_p, shuffle=False,
+                                            sis=sis, correct_first=correct_first, mode="plot", threshold_p=threshold_p,
+                                            shuffle=False,
                                             colorful=colorful)
+                # correcting the format
+                df_corrs = pd.read_pickle("df_corrs.pkl")
+                df_corrs.index = create_list_of_names(df_corrs.index)
+                df_corrs.to_pickle("df_corrs.pkl")
+                df_corrs.to_csv(f"{folder}/df_corrs.csv")
