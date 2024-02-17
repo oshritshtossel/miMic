@@ -7,8 +7,8 @@ try:
 except:
     from src.mimic import apply_mimic
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     # Load the raw data in the required format
     df = pd.read_csv("between/ibd_for_process.csv")
     tag = pd.read_csv("between/ibd_tag.csv", index_col=0)
@@ -21,7 +21,7 @@ if __name__ == '__main__':
     samba.micro2matrix(processed, folder, save=True)
 
     # Apply miMic test
-    taxonomy_selected = apply_mimic(folder, tag, eval="man",threshold_p=0.05)
+    taxonomy_selected = apply_mimic(folder, tag, eval="man", threshold_p=0.05, save=True)
     if taxonomy_selected is not None:
-        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", save=False,threshold_p=0.05)
-
+        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", sis='fdr_bh', save=False,
+                    threshold_p=0.05, THRESHOLD_edge=0.5)
