@@ -1384,6 +1384,6 @@ def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode=
                 # Plot inside plots on the taxonomy selected
                 calculate_all_imgs_tag_corr(folder, tag, tax, eval=eval,
                                             sis=sis, correct_first=correct_first, mode="plot", threshold_p=threshold_p,
-                                            THRESHOLD=THRESHOLD_edge,
+                                            THRESHOLD_edge=THRESHOLD_edge,
                                             shuffle=False,
                                             colorful=colorful)
