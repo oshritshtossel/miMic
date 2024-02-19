@@ -79,8 +79,6 @@ def build_img_from_table(table, col1, col2, names):
     :param names: List of sample names (list)
     :return: Images of test's scores (img_s) and images of test's p-values (img_p)
     """
-    pd.set_option('display.float_format', '{:.50f}'.format)
-
     cols = len(names.columns)
     rows = len(names.index)
     img_p = np.zeros((rows, cols))
@@ -103,7 +101,6 @@ def build_img_from_table(table, col1, col2, names):
 
 def create_list_of_names(list_leaves):
     """
-
     Fix taxa names for tree plot.
     :param list_leaves: List of leaves names without the initials (list).
     :return: Corrected list taxa names.
@@ -111,80 +108,36 @@ def create_list_of_names(list_leaves):
     list_lens = [len(i.split(";")) for i in list_leaves]
     otu_train_cols = list()
     for i, j in zip(list_leaves, list_lens):
-        parts = i.rsplit("_", maxsplit=1)
-        flag = False
-        if len(parts) == 2:
-            flag = True
+
         if j == 1:
-            if flag and parts[1].isdigit():
-                updated = "k__" + parts[0].split(";")[-1]
-            else:
-                updated = "k__" + i.split(";")[0]
+            updated = "k__" + i.split(";")[0]
 
         elif j == 2:
-            if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + parts[0].split(";")[-1]
-            else:
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1]
+            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1]
 
         elif j == 3:
-            if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
-                          parts[0].split(";")[-1]
-            else:
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
-                          i.split(";")[2]
+            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + \
+                      i.split(";")[2]
         elif j == 4:
-            if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + parts[0].split(";")[-1]
-
-            else:
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3]
+            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                2] + ";" + "o__" + i.split(";")[3]
 
         elif j == 5:
-            if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + parts[0].split(";")[-1]
-            else:
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4]
+            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4]
 
         elif j == 6:
-            if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
-                          parts[0].split(";")[-1]
-            else:
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
-                          i.split(";")[5]
+            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + \
+                      i.split(";")[5]
 
         elif j == 7:
-            if flag and parts[1].isdigit():
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
-                              5] + ";" + "s__" + parts[0].split(";")[-1]
-            else:
-                updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
-                    2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
-                              5] + ";" + "s__" + i.split(";")[6]
+            updated = "k__" + i.split(";")[0] + ";" + "p__" + i.split(";")[1] + ";" + "c__" + i.split(";")[
+                2] + ";" + "o__" + i.split(";")[3] + ";" + "f__" + i.split(";")[4] + ";" + "g__" + i.split(";")[
+                          5] + ";" + "s__" + i.split(";")[6]
+
         otu_train_cols.append(updated)
     return otu_train_cols
-
-
-def find_actual_name(s, first_non_empty_cells):
-    """
-    Find the actual name of the cell before fixing the name to the correct version of taxonomy.
-    :param s: Cell name (str).
-    :param first_non_empty_cells: List of first non-empty cells (list).
-    :return: Actual name of the cell (str).
-    """
-    for cell in first_non_empty_cells:
-        if cell == s or cell.startswith(s + '_'):
-            return cell
-    return None
 
 
 def rgba_to_hex(rgba):
@@ -223,7 +176,11 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
     for col_idx in range(num_cols):
         flag = False
         for row_idx in reversed(range(num_rows)):
-            # Check if the current cell is empty (None or nan)
+            # if the kingdom is unassigned, we will set the first non empty cell to 0.0
+            if 'unassigned' in names[1,col_idx].lower():
+                first_non_empty_cells[col_idx] = '0.0'
+                break
+            # Check if the current cell is empty (None or nan or 0.0) we can check it if it contains at least one letter
             contains_letter = any(char.isalpha() for char in names[row_idx, col_idx])
             if not contains_letter:
                 continue
@@ -233,7 +190,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
                 if mean_0[row_idx, col_idx] < threshold_p and mean_0[row_idx, col_idx] != 0.0:
                     flag = True
                     first_non_empty_cells[col_idx] = names[row_idx, col_idx]
-                    names[row_idx, col_idx] = names[row_idx, col_idx].rsplit('_', maxsplit=1)[0]
+                    names[row_idx, col_idx] = names[row_idx, col_idx]
                 if flag == False:
                     first_non_empty_cells[col_idx] = '0.0'
                 break
@@ -392,11 +349,12 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
 
     for node in T0.get_descendants():
         if node.is_leaf():
+            # checking if the name is ending with _{digit} if so i will remove it
+            if node.name[-1].isdigit() and node.name.endswith(f'_{node.name[-1]}'):
+                node.name= node.name[:-1]
             name = node.name.replace('_', ' ').capitalize()
-            name = "".join([i for i in name if not i.isdigit()])
             if name == "":
-                name = node.get_ancestors()[0].name.replace("_", " ").capitalize()
-                name = "".join([i for i in name if not i.isdigit()])
+                name = node.get_ancestors()[0].replace("_", " ").capitalize()
             node.name = name
 
     for node in T0.get_descendants():
@@ -477,7 +435,7 @@ def build_interactions(bact_names, img_array, save, family_colors, threshold_p=0
         row = all_ps.loc[pixel]["len"]
         pixel_o = convert_original(pixel)
         indexes = min(
-            [i for i, value in enumerate(bact_names.loc[row]) if pixel_o == value.rsplit('_', maxsplit=1)[0]])
+            [i for i, value in enumerate(bact_names.loc[row]) if pixel_o == value])
         df_index["index"][pixel] = indexes
     only_significant["index"] = df_index["index"]
     # only species
@@ -789,7 +747,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
                     all_ps[tax] = corrected_p_values_r[e]
                 else:
                     try:
-                        # the leaf is not significant so we are label it with a p-value that bigger than the threshold
+                        # the leaf is not significant we will label it with a p-value that bigger than the threshold
                         all_ps[tax] = threshold_p + 0.01
                         del dict_ps[tax]
                     except:
@@ -798,7 +756,6 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
     binary_rec_by_pval(different_tax_in_level, eval, sis)
 
     if correct_first:
-        # pd.set_option('display.float_format', '{:.50f}'.format)
 
         all_ps_df = pd.Series(all_ps)
         all_ps_df = all_ps_df.to_frame()
@@ -867,7 +824,6 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
             imgs_p, imgs_s = build_img_from_table(all_ps_df, 0, "s", bact_names_df)
 
             df_corss = pd.read_pickle("df_corrs.pkl")
-            pd.set_option('display.float_format', '{:.50f}'.format)
 
             for df_corr_name in enumerate(df_corss.index):
                 df_corr_name = df_corr_name[1]
@@ -1158,7 +1114,7 @@ def calculate_rsp(df, save):
     plt.show(block=False)
 
 
-def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode="test", save=False, tax=None,
+def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode="test", save=True, tax=None,
                 colorful=True, threshold_p=0.05, THRESHOLD_edge=0.5):
     """
     Apply the apriori ANOVA test and the post hoc test of miMic.
@@ -1181,8 +1137,8 @@ def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode=
     """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-        if mode == 'test':
 
+        if mode == 'test':
             print("\nApply nested Anova test")
             p = apply_nested_anova(folder, tag, mode=mode, eval=eval, threshold_p=threshold_p)
             if p > threshold_p:
