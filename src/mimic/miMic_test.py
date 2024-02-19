@@ -177,7 +177,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
         flag = False
         for row_idx in reversed(range(num_rows)):
             # if the kingdom is unassigned, we will set the first non empty cell to 0.0
-            if 'unassigned' in names[1,col_idx].lower():
+            if 'unassigned' in names[1, col_idx].lower():
                 first_non_empty_cells[col_idx] = '0.0'
                 break
             # Check if the current cell is empty (None or nan or 0.0) we can check it if it contains at least one letter
@@ -351,7 +351,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
         if node.is_leaf():
             # checking if the name is ending with _{digit} if so i will remove it
             if node.name[-1].isdigit() and node.name.endswith(f'_{node.name[-1]}'):
-                node.name= node.name[:-1]
+                node.name = node.name[:-1]
             name = node.name.replace('_', ' ').capitalize()
             if name == "":
                 name = node.get_ancestors()[0].replace("_", " ").capitalize()
@@ -764,7 +764,9 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
         all_ps_df["s"] = pd.Series(all_stat)
 
         to_test = all_ps_df[all_ps_df["len"] == start_i]
+        flag_throw = False
         if len(to_test.index) > 1:
+            flag_throw = True
             rejected_r, corrected_p_values_r, _, _ = smt.multipletests(list(to_test[0].values),
                                                                        method=sis)
             to_test[0] = corrected_p_values_r
@@ -817,7 +819,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
             # Plot correlations within family (4)
 
             if correct_first:
-                if not all_ps_df.empty:
+                if not all_ps_df.empty and flag_throw:
                     to_throw_indexes = all_ps_df.index.str.contains('|'.join(to_throw.index))
                     all_ps_df.loc[to_throw_indexes, 0] = threshold_p + 0.01
 
