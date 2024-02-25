@@ -72,7 +72,7 @@ The example containing the following steps:
       - "man" for binary labels.
       - "corr" for continuous labels.
       - "cat" for categorical labels.
-    - **sis**: apply sister correction,["fdr_bh", "bonferroni", "no"]. Default is <u>"df_bh"</u>.
+    - **sis**: apply sister correction,["fdr_bh", "bonferroni", "no"]. Default is <u>"dfr_bh"</u>.
     - **correct_first**: apply FDR correction to the starting taxonomy level,[True, False] Default is <u>True</u>.
     - **mode**: 2 different formats of running,["test", "plot"]. Default is <u>"test"</u>.
     - **save**: whether to save the corrs_df od the miMic test to computer,[True, False] Default is <u>True</u>.
@@ -112,15 +112,16 @@ The following plots will be saved:
    3. **hist**: a histogram of the ASVs in each taxonomy level.   
   ![hist](https://github.com/oshritshtossel/miMic/blob/master/plots/hist.png)
 
-   4. **corrs_within_family**: a plot of the correlation between the significant ASVs within the family level, if `colorful` is set to True, each family will be colored.  
-   5. **interaction**: a plot of the interaction between the significant ASVs.
+   4. **corrs_within_family**: a plot of the correlation between the significant ASVs within the family level, if `colorful` is set to True, each family will be colored.    
+  ![corrs_within_family](https://github.com/oshritshtossel/miMic/blob/master/plots/corrs_within_family.png)
+
+   5. **interaction**: a plot of the interaction between the significant ASVs.  
+  ![interaction](https://github.com/oshritshtossel/miMic/blob/master/plots/interaction.png)
+
    6. **correlations_tree**: Create correlation cladogram, such that tha size of each node is according to the -log(p-value), the color of 
        each node represents the sign of the post hoc test, the shape of the node (circle, square,sphere) is based on 
-       miMic, Utest, or both results accordingly, and if `colorful` is set to True, the background color of the node will be colored based on the family color. 
-
-![corrs_within_family](https://github.com/oshritshtossel/miMic/blob/master/plots/corrs_within_family.png)
-![interaction](https://github.com/oshritshtossel/miMic/blob/master/plots/interaction.png)
-![correlations_tree](https://github.com/oshritshtossel/miMic/blob/master/plots/correlations_tree.png)
+       miMic, Utest, or both results accordingly, and if `colorful` is set to True, the background color of the node will be colored based on the family color.  
+   ![correlations_tree](https://github.com/oshritshtossel/miMic/blob/master/plots/correlations_tree.png)
 
 
 
