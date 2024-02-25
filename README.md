@@ -27,7 +27,7 @@ pip install mimic-da
 See `example_use.py` for an example of how to use miMic.  
 The example containing the following steps:
 
-1. First, import Mimic and additional packages.
+1.  Import Mimic and additional packages.
     ```python
     from mimic import apply_mimic
     import pandas as pd
