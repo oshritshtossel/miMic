@@ -27,7 +27,14 @@ pip install mimic-da
 See `example_use.py` for an example of how to use miMic.  
 The example containing the following steps:
 
-1. Load the raw ASVs table in the following format:    
+1. First, import Mimic and additional packages.
+    ```python
+    from mimic import apply_mimic
+    import pandas as pd
+    import SAMBA
+    ```
+
+2. Load the raw ASVs table in the following format:    
    - The first column is named "ID"
    - Each row represents a sample and each column represents an ASV.  
    - The last row contains the taxonomy information, named "taxonomy".
@@ -35,10 +42,10 @@ The example containing the following steps:
     ```python
     df = pd.read_csv("example_data/for_process.csv")
     ```
-   - <u>Note:</u> `for_process.csv` is a file that contains the raw ASVs table in the required format, you can find an exmaple file in `example_data` folder.
+   - <u>Note:</u> `for_process.csv` is a file that contains the raw ASVs table in the required format, you can find an exmaple file in `example_data` folder.   
 
 
-3. Load a tag table as CSV, such that the tag column is named "Tag".
+3. Load a tag table as csv, such that the tag column is named "Tag".
 
       ```python
     tag = pd.read_csv("example_data/tag.csv",index_col=0)
@@ -46,7 +53,7 @@ The example containing the following steps:
    - <u>Note:</u>  `tag.csv` is a file that contains the tag table in the required format, you can find an example tag in `example_data` folder.
 
 
-3. Apply MIPMLP.
+4. Apply MIPMLP.
    - MIPMLP using defaulting parameters, you can find more in 'Note' section below.
    - taxonomy_group: ["sub PCA", "mean", "sum"], "sub PCA" method is preferred.
 
@@ -56,7 +63,7 @@ The example containing the following steps:
   - <u>Note:</u>  MIPMLP is a package that is used to preprocess the raw ASVs table, see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations.
      
 
-4. Apply micro2matrix.
+5. Apply micro2matrix.
 
       ```python
         folder = "example_data/2D_images"
@@ -66,16 +73,16 @@ The example containing the following steps:
      For more information on [SAMBA](https://github.com/oshritshtossel/SAMBA) and for further distance calculations.
 
 
-5. Apply miMic test.   
+6. Apply miMic test.   
    miMic using the following hyperparameters:   
     - **eval**: evaluation method, ["man", "corr", "cat"]. Default is <u>"man"</u>.
       - "man" for binary labels.
       - "corr" for continuous labels.
       - "cat" for categorical labels.
     - **sis**: apply sister correction,["fdr_bh", "bonferroni", "no"]. Default is <u>"dfr_bh"</u>.
-    - **correct_first**: apply FDR correction to the starting taxonomy level,[True, False] Default is <u>True</u>.
+    - **correct_first**: apply FDR correction to the starting taxonomy level according to `sis` parameter,[True, False] Default is <u>True</u>.
     - **mode**: 2 different formats of running,["test", "plot"]. Default is <u>"test"</u>.
-    - **save**: whether to save the corrs_df od the miMic test to computer,[True, False] Default is <u>True</u>.
+    - **save**: whether to save the corrs_df of the miMic test to computer,[True, False] Default is <u>True</u>.
     - **tax**: starting taxonomy of the post hoc test,["None", 1, 2, 3, "noAnova", "nosignifacnt"]   
       - In <u>"test"</u> mode the defaulting value is <u>"None"</u>. 
       - In the <u>"plot"</u> mode the tax is <u>set automatically</u> to the selected taxonomy of the "test" mode [1, 2, 3, "noAnova"].
