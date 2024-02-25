@@ -1,4 +1,4 @@
-# <h2 style="color:pink;">miMic (Mann-Whitney image microbiome) </h2>
+# miMic (Mann-Whitney image microbiome) 
 
 This repository is attached to the paper "miMic - a novel multi-layer statistical test for microbiome disease".    
 miMic is a straightforward yet remarkably versatile and scalable approach for differential abundance analysis.
@@ -12,18 +12,18 @@ miMic consists of three main steps:
 -  A post hoc test along the cladogram trajectories.
 
 
-## <h2 style="color:pink;"> miMic</h2>
+##  miMic
 
 miMic is available through the following platforms:
 - [GitHub](https://github.com/oshritshtossel/miMic) 
 - [PyPi](https://pypi.org/project/mimic-da/)
-- [website](https://micros.math.biu.ac.il/).
+- [Website](https://micros.math.biu.ac.il/).
 
 ### Install the package
 ```python
 pip install mimic-da
 ```
-### <h2 style="color:pink;"> How to apply miMic </h2>
+##  How to apply miMic 
 See `example_use.py` for an example of how to use miMic.  
 The example containing the following steps:
 
@@ -91,7 +91,7 @@ The example containing the following steps:
         apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", sis='fdr_bh', save=False,
                     threshold_p=0.05, THRESHOLD_edge=0.5)
    ```
-### <h2 style="color:pink;"> miMic output</h2>
+##  miMic output
 miMic will output the following:
 
 - If `save` is set to True, the following csv will be saved to your specified folder:
@@ -112,8 +112,12 @@ The following plots will be saved:
        each node represents the sign of the post hoc test, the shape of the node (circle, square,sphere) is based on 
        miMic, Utest, or both results accordingly, and if `colorful` is set to True, the background color of the node will be colored based on the family color. 
 
-
-
+![tax_vs_rp_sp_anova_p](https://github.com/oshritshtossel/miMic/tree/master/plots/tax_vs_rp_sp_anova_p.png)
+![rsp_vs_beta](https://github.com/oshritshtossel/miMic/blob/master/plots/rsp_vs_beta.png)
+![hist](https://github.com/oshritshtossel/miMic/blob/master/plots/hist.png)
+![corrs_within_family](https://github.com/oshritshtossel/miMic/blob/master/plots/corrs_within_family.png)
+![interaction](https://github.com/oshritshtossel/miMic/blob/master/plots/interaction.png)
+![correlations_tree](https://github.com/oshritshtossel/miMic/blob/master/plots/correlations_tree.png)
 
 
 
