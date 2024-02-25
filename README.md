@@ -31,8 +31,6 @@ The example containing the following steps:
     ```python
     from mimic import apply_mimic
     import pandas as pd
-    import MIPMLP
-    import samba
     ```
 
 2. Load the raw ASVs table in the following format:    
@@ -59,22 +57,14 @@ The example containing the following steps:
    - taxonomy_group: ["sub PCA", "mean", "sum"], "sub PCA" method is preferred.
 
    ```python
-   processed = MIPMLP.preprocess(df,taxnomy_group="sub PCA")
+   processed = apply_mimic(folder=folder, tag=tag, mode="preprocess", preprocess=True, rawData=df,
+                            taxnomy_group='sub PCA')
    ```
-  - <u>Note:</u>  MIPMLP is a package that is used to preprocess the raw ASVs table, see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations.
-     
+   
+  - <u>Note:</u>  MIPMLP is a package that is used to preprocess the raw ASVs table, see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations.   
+<u>If you have your own processed data</u>, set `preprocess` to False, and use your processed data as input for `proceesed` parameter in the next step.
 
-5. Apply micro2matrix.
-
-      ```python
-        folder = "example_data/2D_images"
-        samba.micro2matrix(processed, folder, save=True)
-    ```
-   - <u>Note:</u> micro2matrix is a function that is used to translate microbiome into matrix according to [iMic](https://www.tandfonline.com/doi/full/10.1080/19490976.2023.2224474), and save the images in a prepared folder.   
-     For more information on [SAMBA](https://github.com/oshritshtossel/SAMBA) and for further distance calculations.
-
-
-6. Apply miMic test.   
+5. Apply miMic test.   
    miMic using the following hyperparameters:   
     - **eval**: evaluation method, ["man", "corr", "cat"]. Default is <u>"man"</u>.
       - "man" for binary labels.
@@ -91,13 +81,15 @@ The example containing the following steps:
       - "nosignificant", where apriori nested ANOVA test is not significant and miMic did not find any significant taxa in the leafs. In this case, the post hoc test will **not** be applied.
     - **colorful**: Determines whether to apply colorful mode on the plots [True, False]. <u>Default</u> is True.
     - **threshold_p**: the threshold for significant values. Default is <u>0.05</u>.
-    - **THRESHOLD**: the threshold for having an edge in "interaction" plot. Default is <u>0.5</u>.
-
+    - **THRESHOLD_edge**: the threshold for having an edge in "interaction" plot. Default is <u>0.5</u>.
+    - **processed**: the processed data from the previous step. Default is <u>None</u>.
+   
      ```python
-      taxonomy_selected = apply_mimic(folder, tag, eval="man", threshold_p=0.05, save=True)
-      if not taxonomy_selected:
-        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", sis='fdr_bh', save=False,
-                    threshold_p=0.05, THRESHOLD_edge=0.5)
+     if processed is not None:
+        taxonomy_selected = apply_mimic(folder, tag, eval="man", threshold_p=0.05, save=True, processed=processed)
+        if taxonomy_selected is not None:
+            apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", sis='fdr_bh', save=False,
+                        threshold_p=0.05, THRESHOLD_edge=0.5)
    ```
 ##  miMic output
 miMic will output the following:

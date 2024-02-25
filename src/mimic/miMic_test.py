@@ -1121,7 +1121,7 @@ def calculate_rsp(df, save):
 
 
 def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode="test", save=True, tax=None,
-                colorful=True, threshold_p=0.05, THRESHOLD_edge=0.5, rowData=None, taxnomy_group="sub PCA"):
+                colorful=True, threshold_p=0.05, THRESHOLD_edge=0.5, rawData=None, taxnomy_group="sub PCA", preprocess='True', processed=None):
     """
     Apply the apriori ANOVA test and the post hoc test of miMic.
     :param folder: Folder path of the iMic images (str).
@@ -1136,6 +1136,10 @@ def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode=
     :param tax: Starting taxonomy selected in the post hoc test (int).
     :param threshold_p: The threshold for significant value (float).
     :param THRESHOLD: The threshold for having an edge in "interaction" plot (float).
+    :param rawData: Dataframe with the raw data (dataframe).
+    :param taxnomy_group: The group of the taxonomy (str).["sub PCA", "mean", "sum"], default is "sub PCA".
+    :param preprocess: Determines whether to preprocess the data (Boolean). Default is True.
+    :param processed: Processed data (dataframe).
     :return: If the apriori test is not significant, prints that and does not continue to the next step. If the
     apriori test is significant prints that and continues to the post hoc test. Prints the number of RPs found in each
     taxonomy level. At last if the the save variable is True it saves the df_corrs. It returns the selected starting taxonomy in the test mode.
@@ -1144,17 +1148,26 @@ def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode=
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        if mode == 'preprocess':
-            #checking if the rowData is not provided
-            if rowData is None:
-                print("Please provide a rowData in format of a csv file.")
+        if mode is "preprocess":
+            if preprocess:
+                #checking if the rowData is not provided
+                if rawData is None:
+                    print("Please provide a rowData in format of a csv file.")
+                    return
+
+                processed = MIPMLP.preprocess(rawData, taxnomy_group=taxnomy_group)
+                print("Preprocessing is done.")
+                return processed
+            else:
                 return
 
-            processed = MIPMLP.preprocess(rowData, taxnomy_group=taxnomy_group)
-            samba.micro2matrix(processed, folder, save=True)
 
 
         if mode == 'test':
+            if processed is None:
+                print("Please provide a processed data.")
+                return
+            samba.micro2matrix(processed, folder, save=True)
             print("\nApply nested Anova test")
             p = apply_nested_anova(folder, tag, mode=mode, eval=eval, threshold_p=threshold_p)
             if p > threshold_p:
