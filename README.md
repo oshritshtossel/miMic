@@ -104,17 +104,20 @@ miMic will output the following:
 - If `mode` is set to "plot", plots will be saved in the folder named <u>'plots'</u> in your current working directory.    
 The following plots will be saved:
    1.  **tax_vs_rp_sp_anova_p**: Plot RP vs SP over the different taxonomy levels and the p-values of the apriori test as function of taxonomy
+  ![tax_vs_rp_sp_anova_p](https://github.com/oshritshtossel/miMic/blob/master/plots/tax_vs_rp_sp_anova_p.png)
+
    2. **rsp_vs_beta**: Calculate RSP score for different betas and create the appropriate plot.
+  ![rsp_vs_beta](https://github.com/oshritshtossel/miMic/blob/master/plots/rsp_vs_beta.png)
+
    3. **hist**: a histogram of the ASVs in each taxonomy level.
+  ![hist](https://github.com/oshritshtossel/miMic/blob/master/plots/hist.png)
+
    4. **corrs_within_family**: a plot of the correlation between the significant ASVs within the family level, if `colorful` is set to True, each family will be colored.  
    5. **interaction**: a plot of the interaction between the significant ASVs.
    6. **correlations_tree**: Create correlation cladogram, such that tha size of each node is according to the -log(p-value), the color of 
        each node represents the sign of the post hoc test, the shape of the node (circle, square,sphere) is based on 
        miMic, Utest, or both results accordingly, and if `colorful` is set to True, the background color of the node will be colored based on the family color. 
 
-![tax_vs_rp_sp_anova_p](https://github.com/oshritshtossel/miMic/tree/master/plots/tax_vs_rp_sp_anova_p.png)
-![rsp_vs_beta](https://github.com/oshritshtossel/miMic/blob/master/plots/rsp_vs_beta.png)
-![hist](https://github.com/oshritshtossel/miMic/blob/master/plots/hist.png)
 ![corrs_within_family](https://github.com/oshritshtossel/miMic/blob/master/plots/corrs_within_family.png)
 ![interaction](https://github.com/oshritshtossel/miMic/blob/master/plots/interaction.png)
 ![correlations_tree](https://github.com/oshritshtossel/miMic/blob/master/plots/correlations_tree.png)
