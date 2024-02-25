@@ -61,8 +61,9 @@ The example containing the following steps:
                             taxnomy_group='sub PCA')
    ```
    
-  - <u>Note:</u>  MIPMLP is a package that is used to preprocess the raw ASVs table, see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations.   
+   - <u>Note:</u>  MIPMLP is a package that is used to preprocess the raw ASVs table, see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations.   
 <u>If you have your own processed data</u>, set `preprocess` to False, and use your processed data as input for `proceesed` parameter in the next step.
+
 
 5. Apply miMic test.   
    miMic using the following hyperparameters:   
