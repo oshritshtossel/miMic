@@ -9,7 +9,7 @@ name = "mimic-da"
 version = "0.0.8"
 description = ""
 readme = "README.md"
-authors = [{ name = "Oshrit Shtossel", email = "oshritvig@gmail.com" }]
+authors = [{ name = "Oshrit Shtossel, Shani FInkelstein", email = "oshritvig@gmail.com, shaninn123@gmail.com" }]
 license = { file = "LICENSE.txt" }
 classifiers = [
     "License :: OSI Approved :: MIT License",
