@@ -1,147 +1,124 @@
-# miMic (Mann-Whitney image microbiome)
+# <h2 style="color:pink;">miMic (Mann-Whitney image microbiome) </h2>
 
-This code is attached to the paper "miMic - a novel multi-layer statistical test for microbiome disease". 
+This repository is attached to the paper "miMic - a novel multi-layer statistical test for microbiome disease".    
 miMic is a straightforward yet remarkably versatile and scalable approach for differential abundance analysis.
-miMic consists of three main steps: 
 
-(1)  Data preprocessing and translation to a cladogram of means.
+miMic consists of three main steps:
 
-(2)  An apriori nested ANOVA (or nested GLM for continuous labels to detect overall microbiome-label relations.
+- Data preprocessing and translation to a cladogram of means.
 
-(3)  A post hoc test along the cladogram trajectories.
+-  An apriori nested ANOVA (or nested GLM for continuous labels) to detect overall microbiome-label relations.
+
+-  A post hoc test along the cladogram trajectories.
 
 
-## How to apply miMic
+## <h2 style="color:pink;"> miMic</h2>
 
-miMic is available at this [GitHub](https://github.com/oshritshtossel/miMic), [PyPi](https://pypi.org/project/mimic-da/), and in the following [website](https://www.google.com).
+miMic is available through the following platforms:
+- [GitHub](https://github.com/oshritshtossel/miMic) 
+- [PyPi](https://pypi.org/project/mimic-da/)
+- [website](https://micros.math.biu.ac.il/).
 
-### miMic's GitHub
-There is an example in example_use.py. You should follow the following steps:
-
-1. Load the raw ASVs table in the following format: the first column is named "ID", each row represents a sample and each column represents an ASV. The last row contains the taxonomy information, named "taxonomy".
-
-```python
-df = pd.read_csv("example_data/for_process.csv")
-```
-
-2. Load a tag table as CSV, such that the tag column is named "Tag".
-
-  ```python
-tag = pd.read_csv("example_data/tag.csv",index_col=0)
-```
-
-3. Apply the MIPMLP with the defaulting parameters, except for the taxnomy_group that the "sub PCA" method is preferred
- (see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations).
-
-```python
-   processed = MIPMLP.preprocess(df,taxnomy_group="sub PCA")
-```
-
-4. micro2matrix (translate microbiome into matrix according to [iMic](https://www.tandfonline.com/doi/full/10.1080/19490976.2023.2224474), and save the images in a prepared folder.
-
-  ```python
-   folder = "example_data/2D_images"
-    samba.micro2matrix(processed, folder, save=True)
-   ```
-  Note for more information on [SAMBA](https://github.com/oshritshtossel/SAMBA) and for further distance calculations.
-
-5. Apply the miMic test.
-   One can choose the following hyperparameters:
-
-   - **eval** (evaluation method) Choose one of **"mann"** for binary labels, **"corr"** for continuous labels, and **"cat"** for categorical labels.
-   - **sis** (apply sister correction) Choose one of **"bonferroni"** (defaulting value) or **"no"**.
-   - **correct_first** (apply FDR correction to the starting taxonomy level) Choose one of **True** (defaulting value) or **False**.
-   - **mode** (2 different formats of running) Choose one of **"test"** (defaulting value)  or **"plot"**. The "plot" mode should be applied only if the "test" mode is significant.
-   - **save** (whether to save the corrs_df od the miMic test to computer) Choose one of **True** (defaulting value)  or **False**.
-   - **tax** (Starting taxonomy of the post hoc test) Choose one of **None** ((defaulting value for "test" mode) or one of **1**, **2**, **3**, **4**, **5**, **6**, **7**. In the "plot" mode the tax is set automatically to the selected taxonomy of the "test" mode.
-
-     ```python
-      taxonomy_selected = apply_mimic(folder, tag, eval="man")
-      if not taxonomy_selected:
-        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man")
-   ```
-
-### miMic's PyPi
-
-1. Install the package
-
+### Install the package
 ```python
 pip install mimic-da
 ```
+### <h2 style="color:pink;"> How to apply miMic </h2>
+See `example_use.py` for an example of how to use miMic.  
+The example containing the following steps:
 
-2. Load the raw ASVs table in the following format: the first column is named "ID", each row represents a sample and each column represents an ASV. The last row contains the taxonomy information, named "taxonomy".
+1. Load the raw ASVs table in the following format:    
+   - The first column is named "ID"
+   - Each row represents a sample and each column represents an ASV.  
+   - The last row contains the taxonomy information, named "taxonomy".
 
-```python
-df = pd.read_csv("example_data/for_process.csv")
-```
+    ```python
+    df = pd.read_csv("example_data/for_process.csv")
+    ```
+   - <u>Note:</u> `for_process.csv` is a file that contains the raw ASVs table in the required format, you can find an exmaple file in `example_data` folder.
+
 
 3. Load a tag table as CSV, such that the tag column is named "Tag".
 
-  ```python
-tag = pd.read_csv("example_data/tag.csv",index_col=0)
-```
+      ```python
+    tag = pd.read_csv("example_data/tag.csv",index_col=0)
+      ```
+   - <u>Note:</u>  `tag.csv` is a file that contains the tag table in the required format, you can find an example tag in `example_data` folder.
 
-4.  Apply the MIPMLP with the defaulting parameters, except for the taxnomy_group that the "sub PCA" method is preferred
- (see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations).
 
-```python
+3. Apply MIPMLP.
+   - MIPMLP using defaulting parameters, you can find more in 'Note' section below.
+   - taxonomy_group: ["sub PCA", "mean", "sum"], "sub PCA" method is preferred.
+
+   ```python
    processed = MIPMLP.preprocess(df,taxnomy_group="sub PCA")
-```
-
-5.  micro2matrix (translate microbiome into matrix according to [iMic](https://www.tandfonline.com/doi/full/10.1080/19490976.2023.2224474), and save the images in a prepared folder.
-
-  ```python
-   folder = "example_data/2D_images"
-    samba.micro2matrix(processed, folder, save=True)
    ```
-  Note for more information on [SAMBA](https://github.com/oshritshtossel/SAMBA) and for further distance calculations.
+  - <u>Note:</u>  MIPMLP is a package that is used to preprocess the raw ASVs table, see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations.
+     
 
-6. Apply the miMic test.
-   One can choose the following hyperparameters:
+4. Apply micro2matrix.
 
-   - **eval** (evaluation method) Choose one of **"mann"** for binary labels, **"corr"** for continuous labels, and **"cat"** for categorical labels.
-   - **sis** (apply sister correction) Choose one of **"bonferroni"** (defaulting value) or **"no"**.
-   - **correct_first** (apply FDR correction to the starting taxonomy level) Choose one of **True** (defaulting value) or **False**.
-   - **mode** (2 different formats of running) Choose one of **"test"** (defaulting value)  or **"plot"**. The "plot" mode should be applied only if the "test" mode is significant.
-   - **save** (whether to save the corrs_df od the miMic test to computer) Choose one of **True** (defaulting value)  or **False**.
-   - **tax** (Starting taxonomy of the post hoc test) Choose one of **None** ((defaulting value for "test" mode) or one of **1**, **2**, **3**, **4**, **5**, **6**, **7**. In the "plot" mode the tax is set automatically to the selected taxonomy of the "test" mode.
+      ```python
+        folder = "example_data/2D_images"
+        samba.micro2matrix(processed, folder, save=True)
+    ```
+   - <u>Note:</u> micro2matrix is a function that is used to translate microbiome into matrix according to [iMic](https://www.tandfonline.com/doi/full/10.1080/19490976.2023.2224474), and save the images in a prepared folder.   
+     For more information on [SAMBA](https://github.com/oshritshtossel/SAMBA) and for further distance calculations.
+
+
+5. Apply miMic test.   
+   miMic using the following hyperparameters:   
+    - **eval**: evaluation method, ["man", "corr", "cat"]. Default is <u>"man"</u>.
+      - "man" for binary labels.
+      - "corr" for continuous labels.
+      - "cat" for categorical labels.
+    - **sis**: apply sister correction,["fdr_bh", "bonferroni", "no"]. Default is <u>"df_bh"</u>.
+    - **correct_first**: apply FDR correction to the starting taxonomy level,[True, False] Default is <u>True</u>.
+    - **mode**: 2 different formats of running,["test", "plot"]. Default is <u>"test"</u>.
+    - **save**: whether to save the corrs_df od the miMic test to computer,[True, False] Default is <u>True</u>.
+    - **tax**: starting taxonomy of the post hoc test,["None", 1, 2, 3, "noAnova", "nosignifacnt"]   
+      - In <u>"test"</u> mode the defaulting value is <u>"None"</u>. 
+      - In the <u>"plot"</u> mode the tax is <u>set automatically</u> to the selected taxonomy of the "test" mode [1, 2, 3, "noAnova"].
+      - "noAnova", where apriori nested ANOVA test is not significant.
+      - "nosignificant", where apriori nested ANOVA test is not significant and miMic did not find any significant taxa in the leafs. In this case, the post hoc test will **not** be applied.
+    - **colorful**: Determines whether to apply colorful mode on the plots [True, False]. <u>Default</u> is True.
+    - **threshold_p**: the threshold for significant values. Default is <u>0.05</u>.
+    - **THRESHOLD**: the threshold for having an edge in "interaction" plot. Default is <u>0.5</u>.
 
      ```python
-     from miMic_test import apply_mimic
-      taxonomy_selected = apply_mimic(folder, tag, eval="man")
+      taxonomy_selected = apply_mimic(folder, tag, eval="man", threshold_p=0.05, save=True)
       if not taxonomy_selected:
-        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man")
+        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", sis='fdr_bh', save=False,
+                    threshold_p=0.05, THRESHOLD_edge=0.5)
    ```
+### <h2 style="color:pink;"> miMic output</h2>
+miMic will output the following:
 
-  ### Code example for GitHub or PyPi
-  ```python
-import pandas as pd
-import MIPMLP
-import samba
+- If `save` is set to True, the following csv will be saved to your specified folder:
+  - **corrs_df**: a dataframe containing the results of the miMic test (including Utest results).
+  - **just_mimic**: a dataframe containing the results of the miMic test without the Utest results.
+  - **u_test_without_mimic**: a dataframe containing the results of the Utest without the miMic results.
+  - **miMic&Utest**: a dataframe containing the joint results of miMic and Utest tests.
 
-try:
-    from mimic import apply_mimic
-except:
-    from src.mimic import apply_mimic
 
-if __name__ == '__main__':
+- If `mode` is set to "plot", plots will be saved in the folder named <u>'plots'</u> in your current working directory.    
+The following plots will be saved:
+   1.  **tax_vs_rp_sp_anova_p**: Plot RP vs SP over the different taxonomy levels and the p-values of the apriori test as function of taxonomy
+   2. **rsp_vs_beta**: Calculate RSP score for different betas and create the appropriate plot.
+   3. **hist**: a histogram of the ASVs in each taxonomy level.
+   4. **corrs_within_family**: a plot of the correlation between the significant ASVs within the family level, if `colorful` is set to True, each family will be colored.  
+   5. **interaction**: a plot of the interaction between the significant ASVs.
+   6. **correlations_tree**: Create correlation cladogram, such that tha size of each node is according to the -log(p-value), the color of 
+       each node represents the sign of the post hoc test, the shape of the node (circle, square,sphere) is based on 
+       miMic, Utest, or both results accordingly, and if `colorful` is set to True, the background color of the node will be colored based on the family color. 
 
-    # Load the raw data in the required format
-    df = pd.read_csv("between/ibd_for_process.csv")
-    tag = pd.read_csv("between/ibd_tag.csv", index_col=0)
 
-    # Apply the MIPMLP with the defaultive parameters
-    processed = MIPMLP.preprocess(df,taxnomy_group="sub PCA")
 
-    # micro2matrix and saving the images in a prepared folder
-    folder = "between/2D_ibd"
-    samba.micro2matrix(processed, folder, save=True)
 
-    # Apply miMic test
-    taxonomy_selected = apply_mimic(folder, tag, eval="man")
-    if taxonomy_selected is not None:
-        apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man")
-   ```
 
+
+
+
+ 
    
    

@@ -151,14 +151,12 @@ def rgba_to_hex(rgba):
 
 def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_colors=None):
     """
-    Create correlation cladogram, such that tha size of each node is according to the -log(p-value),
-    the color of each node represents the sign of the post hoc test and the background color of the node is based on the family.
-    :param names:  List of sample names (list)
-    :param mean_0: 2D ndarray of the images filled with the post hoc p-values (ndarray).
-    :param mean_1:  2D ndarray of the images filled with the post hoc scores (ndarray).
-    :param directory: Folder to save the correlation cladogram (str)
-    :param family_colors: Dictionary of family colors (dict)
-    :return: None
+    Create correlation cladogram, such that tha size of each node is according to the -log(p-value), the color of
+    each node represents the sign of the post hoc test, the shape of the node (circle, square,sphere) is based on
+    miMic, Utest, or both results accordingly, and if `colorful` is set to True, the background color of the node will be colored based on the family color.
+    :param names:  List of sample names (list) :param mean_0: 2D ndarray of the images filled with the post hoc p-values (ndarray).
+    :param mean_1:  2D ndarray of the images filled with the post hoc scores (ndarray). :param directory: Folder to
+    save the correlation cladogram (str) :param family_colors: Dictionary of family colors (dict) :return: None
     """
     T = ete3.PhyloTree()
     u_test = pd.read_pickle("u_test_without_mimic.pkl")
@@ -502,6 +500,8 @@ def build_interactions(bact_names, img_array, save, family_colors, threshold_p=0
         parts = numerical_to_original_names[i].split(';')
         g_part = parts[0].split('g__')[1] if 'g__' in parts[0] else ''
         s_part = parts[1].split('s__')[1] if 's__' in parts[1] else ''
+        g_part= g_part.rsplit("_", maxsplit=1)[0]
+        s_part = s_part.rsplit("_", maxsplit=1)[0]
         node['name'] = g_part + ";" + s_part
 
     node_colors = {i: color for i, color in enumerate(only_significant['color'])}
@@ -872,6 +872,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
                 if pos_count == 0 and neg_count == 0:
                     continue
                 f = f.split(";")[-1].split("__")[1]
+                f= f.rsplit("_", maxsplit=1)[0]
                 dict_pos[f] = pos_count
                 dict_neg[f] = neg_count
 
@@ -880,6 +881,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
             flag = True
             print("miMic did not find significant families.")
         else:
+
             df_to_plot = pd.DataFrame(index=list(dict_pos.keys()), columns=['Positives', 'Negatives'])
             df_to_plot['Positives'] = list(dict_pos.values())
             df_to_plot['Negatives'] = list(dict_neg.values())
