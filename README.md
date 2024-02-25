@@ -17,7 +17,7 @@ miMic consists of three main steps:
 miMic is available through the following platforms:
 - [GitHub](https://github.com/oshritshtossel/miMic) 
 - [PyPi](https://pypi.org/project/mimic-da/)
-- [Website](https://micros.math.biu.ac.il/).
+- [Website](https://micros.math.biu.ac.il/)
 
 ### Install the package
 ```python
