@@ -1,6 +1,8 @@
-import pickle
+import csv
+import io
 import warnings
-
+import MIPMLP
+import samba
 import pandas as pd
 import numpy as np
 import os
@@ -589,7 +591,7 @@ def calc_unique_corr(bact_df, taxon, imgs, tag, eval="corr"):
 
     # calc corr
     if eval == "corr":
-        scc, p = spearmanr(result, tag)
+        scc, p = spearmanr(result, tag['Tag'])
 
     elif eval == "category":
         grouped_data = []
@@ -1119,7 +1121,7 @@ def calculate_rsp(df, save):
 
 
 def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode="test", save=True, tax=None,
-                colorful=True, threshold_p=0.05, THRESHOLD_edge=0.5):
+                colorful=True, threshold_p=0.05, THRESHOLD_edge=0.5, rowData=None, taxnomy_group="sub PCA"):
     """
     Apply the apriori ANOVA test and the post hoc test of miMic.
     :param folder: Folder path of the iMic images (str).
@@ -1141,6 +1143,16 @@ def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode=
     """
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
+
+        if mode == 'preprocess':
+            #checking if the rowData is not provided
+            if rowData is None:
+                print("Please provide a rowData in format of a csv file.")
+                return
+
+            processed = MIPMLP.preprocess(rowData, taxnomy_group=taxnomy_group)
+            samba.micro2matrix(processed, folder, save=True)
+
 
         if mode == 'test':
             print("\nApply nested Anova test")
