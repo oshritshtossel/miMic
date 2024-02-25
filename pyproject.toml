@@ -5,8 +5,8 @@ requires = ["setuptools>=61.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mimic"
-version = "0.0.8"
+name = "mimic-da"
+version = "0.0.9"
 description = ""
 readme = "README.md"
 authors = [{ name = "Oshrit Shtossel, Shani FInkelstein", email = "oshritvig@gmail.com"}]

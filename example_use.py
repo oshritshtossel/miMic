@@ -3,11 +3,11 @@ import pandas as pd
 try:
     from mimic import apply_mimic
 except:
-    from src.mimic import apply_mimic
+    from src.mimic_da import apply_mimic
 
 if __name__ == '__main__':
 
-    # Load the raw data and tag in the csv format => apply 'preprocess' mode => apply mimic with 'test' mode => apply mimic with 'plot' mode
+    # Load the raw data and tag in the csv format => apply 'preprocess' mode => apply mimic_da with 'test' mode => apply mimic_da with 'plot' mode
     df = pd.read_csv("example_data/for_process.csv")
     tag = pd.read_csv("example_data/tag.csv", index_col=0)
     folder = "example_data/2D_images"
