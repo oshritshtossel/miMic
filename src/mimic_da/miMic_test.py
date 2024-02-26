@@ -1,5 +1,3 @@
-import csv
-import io
 import warnings
 import MIPMLP
 import samba
@@ -410,9 +408,8 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
             add_face_to_node(F, node, column=0, position="branch-right")
 
     ts.layout_fn = my_layout
-    ts.show_branch_length = False
     T0.show(tree_style=(ts))
-    T0.render(f"{directory}/correlations_tree.svg", tree_style=deepcopy(ts))
+    T0.render(f"{directory}/correlations_tree.svg", tree_style=deepcopy(ts_copy))
 
 
 def convert_original(name):
