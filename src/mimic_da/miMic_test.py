@@ -216,6 +216,9 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
 
             actual_name = ";".join(s[0])
 
+            if actual_name == 'k__Bacteria;p__Proteobacteria;c__Betaproteobacteria;o__Burkholderiales;f__Oxalobacteraceae_0' or u_test_name=="k__Bacteria;p__Proteobacteria;c__Betaproteobacteria;o__Burkholderiales;f__Oxalobacteraceae_0":
+                c=0
+
             if s[0][-1] not in T or not any([anc.species == a for anc, a in
                                              zip(T.search_nodes(name=s[0][-1])[0].get_ancestors()[:-1],
                                                  reversed(s[0]))]):
@@ -239,7 +242,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
                         if family_colors != None:
                             split_name = str(mimic_and_utest_index[0]).split(';')
                             if len(split_name) >= 5:
-                                family_name = split_name[4].split('__')[1]
+                                family_name = split_name[4].split('__')[1].split('_')[0]
                                 family_color = family_colors.get(family_name, "nocolor")
                             else:
                                 # if the name is not including family level, we will not set a family color
@@ -264,7 +267,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
                     if family_colors != None:
                         split_name = str(in_utest_index[0]).split(';')
                         if len(split_name) >= 5:
-                            family_name = split_name[4].split('__')[1]
+                            family_name = split_name[4].split('__')[1].split('_')[0]
                             family_color = family_colors.get(family_name, "nocolor")
                         else:
                             # if the name is not including family level, we will not set a family color
@@ -287,7 +290,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
                     # setting the family color
                     split_name = actual_name.split(';')
                     if len(split_name) >= 5:
-                        family_color = family_colors.get(actual_name.split(';')[4], "nocolor")
+                        family_color = family_colors.get(actual_name.split(';')[4].split('_')[0], "nocolor")
                     else:
                         family_color = "nocolor"
                     t.add_feature("family_color", family_color)
@@ -399,6 +402,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
             add_face_to_node(F, node, column=0, position="branch-right")
 
     ts.layout_fn = my_layout
+    ts.show_branch_length = False
     T0.show(tree_style=(ts))
     T0.render(f"{directory}/correlations_tree.png", tree_style=deepcopy(ts))
 
