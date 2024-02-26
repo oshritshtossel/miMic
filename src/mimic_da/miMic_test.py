@@ -1057,7 +1057,7 @@ def apply_nested_anova(folder, tag, mode="test", eval="man", threshold_p=0.05):
 
 def plot_rp_sp_anova_p(df, mixed, save):
     """
-     Plot RP vs SP over the different taxonomy levels and color the background of the plot till the selected taxonomy.
+     Plot RP vs SP over the different taxonomy levels and color the background of the plot till the selected taxonomy, based on miMic test.
     :param df: RP and SP dataframe of the post hoc test applied (dataframe).
     :param save: Name of folder to save the plot (str).
     :return: None. Display the RP vs SP .

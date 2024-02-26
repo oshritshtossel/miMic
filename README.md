@@ -104,7 +104,7 @@ miMic will output the following:
 
 - If `mode` is set to "plot", plots will be saved in the folder named <u>'plots'</u> in your current working directory.    
 The following plots will be saved:
-   1.  **tax_vs_rp_sp_anova_p**: plot RP vs SP over the different taxonomy levels and color the background of the plot till the selected taxonomy..   
+   1.  **tax_vs_rp_sp_anova_p**: plot RP vs SP over the different taxonomy levels and color the background of the plot till the selected taxonomy, based on miMic test.  
   ![tax_vs_rp_sp_anova_p](https://github.com/oshritshtossel/miMic/raw/master/plots/tax_vs_rp_sp_anova_p.png)
 
    2. **rsp_vs_beta**: calculate RSP score for different betas and create the appropriate plot.   
