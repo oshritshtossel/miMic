@@ -409,7 +409,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
 
     ts.layout_fn = my_layout
     T0.show(tree_style=(ts))
-    T0.render(f"{directory}/correlations_tree.svg", tree_style=deepcopy(ts_copy))
+    T0.render(f"{directory}/correlations_tree.svg", tree_style=deepcopy(ts))
 
 
 def convert_original(name):

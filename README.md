@@ -134,7 +134,7 @@ The following plots will be saved:
    6. **correlations_tree**: create correlation cladogram, such that tha size of each node is according to the -log(p-value), the color of 
        each node represents the sign of the post hoc test, the shape of the node (circle, square,sphere) is based on 
        miMic, Utest, or both results accordingly, and if `colorful` is set to True, the background color of the node will be colored based on the family color.  
-   ![correlations_tree](https://github.com/oshritshtossel/miMic/raw/master/plots/correlations_tree.pdf)
+   ![correlations_tree](https://github.com/oshritshtossel/miMic/raw/master/plots/correlations_tree.svg)
 
 
 
