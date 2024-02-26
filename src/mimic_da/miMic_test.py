@@ -386,8 +386,8 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
         :param node: Node ETE object
         :return: None
         """
-        node.img_style["hz_line_width"] = 25  # Change the horizontal line width
-        node.img_style["vt_line_width"] = 25
+        node.img_style["hz_line_width"] = 18  # Change the horizontal line width
+        node.img_style["vt_line_width"] = 18
         if node.is_leaf():
             tax = D[len(node.full_name)]
             if len(node.full_name) == 7:
