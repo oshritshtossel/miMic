@@ -29,7 +29,7 @@ The example containing the following steps:
 
 1.  Import miMic and additional packages.
     ```python
-    from mimic import apply_mimic
+    from mimic_da import apply_mimic
     import pandas as pd
     ```
 
