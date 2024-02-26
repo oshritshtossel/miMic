@@ -296,13 +296,14 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
     bound_0 = 0
     for t in T0.get_descendants():
         nstyle = NodeStyle()
-        nstyle["size"] = 20
+        nstyle["size"] = 30
         nstyle["fgcolor"] = "gray"
+
         name = ";".join(t.full_name)
 
         if (t.max_1_grad > bound_0) and (t.max_2_grad < threshold_p):
             nstyle["fgcolor"] = "blue"
-            nstyle["size"] = t.max_0_grad * 15
+            nstyle["size"] = t.max_0_grad * 17
 
             if t.shape == "square":
                 nstyle["shape"] = "square"
@@ -320,7 +321,7 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
         elif (t.max_1_grad < bound_0) and (t.max_2_grad < threshold_p):
 
             nstyle["fgcolor"] = "red"
-            nstyle["size"] = t.max_0_grad * 15
+            nstyle["size"] = t.max_0_grad * 17
 
             if t.shape == "square":
                 nstyle["shape"] = "square"
@@ -385,12 +386,15 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
         :param node: Node ETE object
         :return: None
         """
+        node.img_style["hz_line_width"] = 25  # Change the horizontal line width
+        node.img_style["vt_line_width"] = 25
         if node.is_leaf():
             tax = D[len(node.full_name)]
             if len(node.full_name) == 7:
                 name = node.up.name.replace("[", "").replace("]", "") + " " + node.name.lower()
             else:
                 name = node.name
+
             F = TextFace(f"{name} {tax} ", fsize=100, ftype="Arial")  # {tax}
             add_face_to_node(F, node, column=0, position="branch-right")
 
@@ -502,7 +506,7 @@ def build_interactions(bact_names, img_array, save, family_colors, threshold_p=0
         parts = numerical_to_original_names[i].split(';')
         g_part = parts[0].split('g__')[1] if 'g__' in parts[0] else ''
         s_part = parts[1].split('s__')[1] if 's__' in parts[1] else ''
-        g_part= g_part.rsplit("_", maxsplit=1)[0]
+        g_part = g_part.rsplit("_", maxsplit=1)[0]
         s_part = s_part.rsplit("_", maxsplit=1)[0]
         node['name'] = g_part + ";" + s_part
 
@@ -874,7 +878,7 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
                 if pos_count == 0 and neg_count == 0:
                     continue
                 f = f.split(";")[-1].split("__")[1]
-                f= f.rsplit("_", maxsplit=1)[0]
+                f = f.rsplit("_", maxsplit=1)[0]
                 dict_pos[f] = pos_count
                 dict_neg[f] = neg_count
 
@@ -892,18 +896,28 @@ def calculate_all_imgs_tag_corr(folder, tag, start_i, eval="corr", sis='fdr_bh',
             cmap_set1 = cm.get_cmap('Set3')
 
             # Get the list of color names from the colormaps
-            colors_tab10 = [cm.colors.to_rgba(color) for color in cmap_tab10.colors]
-            colors_set1 = [cm.colors.to_rgba(color) for color in cmap_set1.colors]
+            # colors_tab10 = [cm.colors.to_rgba(color) for color in cmap_tab10.colors]
+            # colors_set1 = [cm.colors.to_rgba(color) for color in cmap_set1.colors]
+
+            colors_tab10 = [cmap_tab10(i) for i in range(cmap_tab10.N)]
+            colors_set1 = [cmap_set1(i) for i in range(cmap_set1.N)]
+            # Function to darken a color
+            def darken_color(color, factor=0.9):
+                return tuple(min(max(comp * factor, 0), 1) for comp in color)
+
+            # Darken colors from both colormaps
+            darkened_colors_tab10 = [darken_color(color) for color in colors_tab10]
+            darkened_colors_set1 = [darken_color(color) for color in colors_set1]
 
             # Concatenate the color names from both colormaps
-            extended_colors = colors_tab10 + colors_set1
+            # extended_colors = colors_tab10 + colors_set1
 
+            extended_colors=  darkened_colors_tab10
             # Create a dictionary to store the color for each family
             family_colors = {}
 
             # Iterate over unique families and assign colors
             unique_families = df_to_plot.index
-            # num_families = len(unique_families)
             for i, family in enumerate(unique_families):
                 # Use modulo to cycle through the extended color list
                 rgba_color = extended_colors[i % len(extended_colors)]
@@ -1043,41 +1057,34 @@ def apply_nested_anova(folder, tag, mode="test", eval="man", threshold_p=0.05):
 
 def plot_rp_sp_anova_p(df, mixed, save):
     """
-    Plot RP vs SP over the different taxonomy levels and the p-values of the apriori test as function of taxonomy.
+     Plot RP vs SP over the different taxonomy levels and color the background of the plot till the selected taxonomy.
     :param df: RP and SP dataframe of the post hoc test applied (dataframe).
     :param save: Name of folder to save the plot (str).
-    :return: None. Display the RP vs SP vs apriori p-values as function of taxonomy.
+    :return: None. Display the RP vs SP .
     """
-    TAX = 1
     SIZE = 15
     mpl.rc('font', family='DejaVu Sans')
     taxonomy_level = ['Kingdom', 'Phylum', 'Class', 'Order', 'Family', 'Genus', 'Species', mixed]
+    tax_level_chosen = mixed.split("&")[0].strip()
+    tax_level_chosen_index = taxonomy_level.index(tax_level_chosen)
 
-    # Assuming df is defined somewhere in your code
     real_sh = df[['RP', 'SP']]
 
     # Create the first y-axis (horizontal bar plot)
     fig, ax1 = plt.subplots(figsize=(6, 4))  # Adjust the figure size as needed
+
     real_sh.plot(kind="barh", color=["blue", "red"], ax=ax1)
-    ax1.set_xlabel("Number of significants (log scale)", fontsize=SIZE)  # Adjust the x-axis label
+    ax1.set_xlabel("Number of significants leafs", fontsize=SIZE)  # Adjust the x-axis label
     ax1.set_yticks(np.arange(len(taxonomy_level)))  # Set the y-ticks to match the custom labels
     ax1.set_yticklabels(taxonomy_level, fontsize=SIZE)
     ax1.set_ylabel("Starting Taxonomy", fontsize=SIZE)
     ax1.tick_params(axis="both", labelsize=SIZE)
     ax1.set_xscale('log')
 
-    # Create a second y-axis (scatter plot)
-    ax2 = ax1.twiny()
-    ax2.set_xticks([0, 5, 10, 15, 20, 25, 30])  # Adjust the ticks as needed
-    ax2.set_xlabel("-log10(p-value)", fontsize=SIZE, color="green")  # Customize the label as needed
-    ax2.tick_params(axis="both", labelsize=SIZE, color="green")  # Adjust tick label font size
-    logged = df["nested-p"].apply(lambda x: -np.log10(x))
-    ax2.plot(logged.values, ax1.get_yticks(), linestyle="-", marker="o", markersize=5, color="green",
-             label="Line Plot")
-    logged_ = logged.values[TAX:]
-
-    ax2.plot(logged_, ax1.get_yticks()[TAX:], linestyle="-", marker="o",
-             markersize=5, color="grey")
+    # Adding background color behind the bars ( from kingdom till the selected taxonomy)
+    ymin = -0.5
+    ymax = tax_level_chosen_index + 0.5
+    ax1.axhspan(ymin, ymax, facecolor='lightgray', zorder=-1)
 
     # Tax vs RP SP ANOVA p plot (1)
     plt.tight_layout()
@@ -1121,7 +1128,8 @@ def calculate_rsp(df, save):
 
 
 def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode="test", save=True, tax=None,
-                colorful=True, threshold_p=0.05, THRESHOLD_edge=0.5, rawData=None, taxnomy_group="sub PCA", preprocess='True', processed=None):
+                colorful=True, threshold_p=0.05, THRESHOLD_edge=0.5, rawData=None, taxnomy_group="sub PCA",
+                preprocess='True', processed=None):
     """
     Apply the apriori ANOVA test and the post hoc test of miMic.
     :param folder: Folder path of the iMic images (str).
@@ -1148,11 +1156,11 @@ def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode=
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
 
-        if mode is "preprocess":
+        if mode == "preprocess":
             if preprocess:
-                #checking if the rowData is not provided
+                # checking if the rowData is not provided
                 if rawData is None:
-                    print("Please provide a rowData in format of a csv file.")
+                    print("Please provide a rawData in format of a csv file.")
                     return
 
                 processed = MIPMLP.preprocess(rawData, taxnomy_group=taxnomy_group)
@@ -1161,13 +1169,11 @@ def apply_mimic(folder, tag, eval="man", sis="fdr_bh", correct_first=True, mode=
             else:
                 return
 
-
-
         if mode == 'test':
-            if processed is None:
-                print("Please provide a processed data.")
-                return
-            samba.micro2matrix(processed, folder, save=True)
+            # if processed is None:
+            #     print("Please provide a processed data.")
+            #     return
+            # samba.micro2matrix(processed, folder, save=True)
             print("\nApply nested Anova test")
             p = apply_nested_anova(folder, tag, mode=mode, eval=eval, threshold_p=threshold_p)
             if p > threshold_p:
