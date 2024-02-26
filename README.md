@@ -52,7 +52,14 @@ The example containing the following steps:
    - <u>Note:</u>  `tag.csv` is a file that contains the tag table in the required format, you can find an example tag in `example_data` folder.
 
 
-4. Apply MIPMLP.
+4. Specify a folder to save the output of the miMic test.   
+   ```python
+   folder = "example_data/2D_images"
+   ```
+   - <u>Note:</u>  `2D_images` is a folder that will be created in your current working directory, and the output of the miMic test will be saved there.
+
+
+5. Apply MIPMLP.
    - MIPMLP using defaulting parameters, you can find more in 'Note' section below.
    - taxonomy_group: ["sub PCA", "mean", "sum"], "sub PCA" method is preferred.
 
@@ -60,12 +67,11 @@ The example containing the following steps:
    processed = apply_mimic(folder=folder, tag=tag, mode="preprocess", preprocess=True, rawData=df,
                             taxnomy_group='sub PCA')
    ```
-   
    - <u>Note:</u>  MIPMLP is a package that is used to preprocess the raw ASVs table, see [MIPMLP PyPi](https://pypi.org/project/MIPMLP/) or [MIPMLP website](https://mip-mlp.math.biu.ac.il/Home) for more explanations.   
 <u>If you have your own processed data</u>, set `preprocess` to False, and use your processed data as input for `proceesed` parameter in the next step.
 
 
-5. Apply miMic test.   
+6. Apply miMic test.   
    miMic using the following hyperparameters:   
     - **eval**: evaluation method, ["man", "corr", "cat"]. Default is <u>"man"</u>.
       - "man" for binary labels.
@@ -84,18 +90,24 @@ The example containing the following steps:
     - **threshold_p**: the threshold for significant values. Default is <u>0.05</u>.
     - **THRESHOLD_edge**: the threshold for having an edge in "interaction" plot. Default is <u>0.5</u>.
     - **processed**: the processed data from the previous step. Default is <u>None</u>.
+    - **apply_samba**: whether to apply samba or no. Default is True (Boolean).
+    - **samba_output**: if you already have samba outputs- miMic will read it from the folder you specified,
+    else miMic will apply samba and set `samba_output` to None.
    
      ```python
-     if processed is not None:
-        taxonomy_selected = apply_mimic(folder, tag, eval="man", threshold_p=0.05, save=True, processed=processed)
-        if taxonomy_selected is not None:
-            apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", sis='fdr_bh', save=False,
-                        threshold_p=0.05, THRESHOLD_edge=0.5)
+       if processed is not None:
+            taxonomy_selected,samba_output = apply_mimic(folder, tag, eval="man", threshold_p=0.05, processed=processed, apply_samba=True, save=False)
+            if taxonomy_selected is not None:
+                apply_mimic(folder, tag, mode="plot", tax=taxonomy_selected, eval="man", sis='fdr_bh', samba_output=samba_output,save=False,
+                            threshold_p=0.05, THRESHOLD_edge=0.5)
    ```
+   - <u>Note:</u>  if `apply_samba` is set to True, miMic will apply samba-metric.   
+   If `save` is set to True, the output will be saved to the folder you specified.   
+   See [SAMBA PyPi](https://pypi.org/project/samba-metric/) for more explanations. 
 ##  miMic output
 miMic will output the following:
 
-- If `save` is set to True, the following csv will be saved to your specified folder:
+- If `save` is set to True, samba outputs and the following csv will be saved to your specified folder:
   - **corrs_df**: a dataframe containing the results of the miMic test (including Utest results).
   - **just_mimic**: a dataframe containing the results of the miMic test without the Utest results.
   - **u_test_without_mimic**: a dataframe containing the results of the Utest without the miMic results.
