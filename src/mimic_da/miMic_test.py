@@ -66,6 +66,7 @@ def load_from_folder(samba_output, folder, tag):
         img_arrays, bact_names, ordered_df = samba_output
         names = ordered_df.index
     tag.index = [str(i) for i in tag.index]
+    names= [str(i) for i in names]
     tag = tag.loc[names]
     index_name = tag.index.name
     if index_name == None:
