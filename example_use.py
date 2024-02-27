@@ -1,9 +1,9 @@
 import pandas as pd
 
-# try:
-#     from mimic_da import apply_mimic
-# except:
-from src.mimic_da import apply_mimic
+try:
+    from mimic_da import apply_mimic
+except:
+    from src.mimic_da import apply_mimic
 
 if __name__ == '__main__':
 
