@@ -25,7 +25,7 @@ pip install mimic-da
 ```
 ##  How to apply miMic 
 See `example_use.py` for an example of how to use miMic.  
-The example containing the following steps:
+The example contains the following steps:
 
 1.  Import miMic and additional packages.
     ```python
@@ -77,7 +77,7 @@ The example containing the following steps:
       - "man" for binary labels.
       - "corr" for continuous labels.
       - "cat" for categorical labels.
-    - **sis**: apply sister correction,["fdr_bh", "bonferroni", "no"]. Default is <u>"dfr_bh"</u>.
+    - **sis**: apply sister correction,["fdr_bh", "bonferroni", "no"]. Default is <u> "fdr_bh"</u>.
     - **correct_first**: apply FDR correction to the starting taxonomy level according to `sis` parameter,[True, False] Default is <u>True</u>.
     - **mode**: 2 different formats of running,["test", "plot"]. Default is <u>"test"</u>.
     - **save**: whether to save the corrs_df of the miMic test to computer,[True, False] Default is <u>True</u>.
