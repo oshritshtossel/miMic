@@ -37,6 +37,8 @@ def load_img(folder_path, tag):
             if file == "bact_names.npy":
                 continue
             file_path = os.path.join(folder_path, file)
+            if file_path=='/home/shanif3/mimic_git/check/img/H174NB_T1.npy':
+                c=0
             # Check if the file name (without the extension) is in the index of a variable 'tag'
             if file_path.split("\\")[-1].replace(".npy", "") in [str(i) for i in tag.index]:
                 arrays.append(np.load(file_path, allow_pickle=True, mmap_mode='r'))
@@ -950,11 +952,17 @@ def calculate_all_imgs_tag_corr(samba_output, folder, tag, start_i, eval="corr",
             # Set the size of the current figure
             fig.set_size_inches(8, fig_height)
             plt.xlabel("Number", fontsize=SIZE)
-            plt.xticks(fontsize=SIZE)
             plt.yticks(range(len(df_to_plot.index)), df_to_plot.index, fontsize=SIZE)
             if family_colors:
                 for label in ax.get_yticklabels():
                     label.set_color(family_colors[label.get_text()])  # Set color based on family name
+
+            if int(df_to_plot['Positives'].max()) > int(df_to_plot['Negatives'].max()):
+                max_index = int(df_to_plot['Positives'].max())
+            else:
+                max_index = int(df_to_plot['Negatives'].max())
+            plt.xticks(np.arange(0, max_index + 1, 1))
+
             plt.tight_layout()
             plt.savefig(f"{directory}/corrs_within_family.png")
             plt.show(block=False)

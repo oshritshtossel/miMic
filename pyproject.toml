@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mimic-da"
-version = "0.0.13"
+version = "0.0.15"
 description = ""
 readme = "README.md"
 authors = [{ name = "Oshrit Shtossel, Shani Finkelstein", email = "oshritvig@gmail.com"}]
