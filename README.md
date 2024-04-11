@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/711493727.svg)](https://zenodo.org/doi/10.5281/zenodo.10958274)
 # miMic (Mann-Whitney image microbiome) 
 
 This repository is attached to the paper "mi-Mic: a novel multi-layer statistical test for microbiota-disease associations".    
