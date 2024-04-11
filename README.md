@@ -1,6 +1,6 @@
 # miMic (Mann-Whitney image microbiome) 
 
-This repository is attached to the paper "miMic - a novel multi-layer statistical test for microbiome disease".    
+This repository is attached to the paper "mi-Mic: a novel multi-layer statistical test for microbiota-disease associations".    
 miMic is a straightforward yet remarkably versatile and scalable approach for differential abundance analysis.
 
 miMic consists of three main steps:

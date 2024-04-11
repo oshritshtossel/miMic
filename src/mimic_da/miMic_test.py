@@ -37,8 +37,6 @@ def load_img(folder_path, tag):
             if file == "bact_names.npy":
                 continue
             file_path = os.path.join(folder_path, file)
-            if file_path=='/home/shanif3/mimic_git/check/img/H174NB_T1.npy':
-                c=0
             # Check if the file name (without the extension) is in the index of a variable 'tag'
             if file_path.split("\\")[-1].replace(".npy", "") in [str(i) for i in tag.index]:
                 arrays.append(np.load(file_path, allow_pickle=True, mmap_mode='r'))
@@ -223,8 +221,6 @@ def creare_tree_view(names, mean_0, mean_1, directory, threshold_p=0.05, family_
 
             actual_name = ";".join(s[0])
 
-            if actual_name == 'k__Bacteria;p__Proteobacteria;c__Betaproteobacteria;o__Burkholderiales;f__Oxalobacteraceae_0' or u_test_name == "k__Bacteria;p__Proteobacteria;c__Betaproteobacteria;o__Burkholderiales;f__Oxalobacteraceae_0":
-                c = 0
 
             if s[0][-1] not in T or not any([anc.species == a for anc, a in
                                              zip(T.search_nodes(name=s[0][-1])[0].get_ancestors()[:-1],
@@ -866,12 +862,15 @@ def calculate_all_imgs_tag_corr(samba_output, folder, tag, start_i, eval="corr",
                     if df_corr_name_o in value:
                         # checking that the cell is a leaf- doesnt have any other children
                         if (len_name_dfcorr == 7) or (
-                                len_name_dfcorr < 7 and bact_names[len_name_dfcorr + 1, col_index] == '0.0'):
+                                len_name_dfcorr < 7 and not (bact_names[len_name_dfcorr + 1, col_index].isalpha())):
                             cell_col = col_index
                             break
                         else:
                             continue
 
+
+                #for the bacterias that are siginifacnt on both- sis and mimic- we will take the mimic results from the df_corrs.
+                # so we will update the p and scc values based on df_corrs- mimic result
                 imgs_p[len_name_dfcorr, cell_col] = df_corss.loc[df_corr_name, "p"]
                 imgs_s[len_name_dfcorr, cell_col] = df_corss.loc[df_corr_name, "scc"]
 
