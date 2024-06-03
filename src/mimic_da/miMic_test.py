@@ -564,8 +564,10 @@ def build_interactions(bact_names, img_array, save, family_colors, threshold_p=0
             node_name = node_name.replace("k__", "g__").replace("p__", "s__")
             family_name = [i.split(';')[4] for i in inter_corr.index if
                            node_name in i]
-            font_color = family_colors.get(family_name[0].split('__')[1], "black")  # Default font color is black
-            t.set_color(font_color)
+            # checking if we got a name and not none
+            if family_name:
+                font_color = family_colors.get(family_name[0].split('__')[1], "black")  # Default font color is black
+                t.set_color(font_color)
 
     # Display the graph
     plt.axis('off')

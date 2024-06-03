@@ -137,7 +137,8 @@ The following plots will be saved:
    ![correlations_tree](https://github.com/oshritshtossel/miMic/raw/master/plots/correlations_tree.svg)
 
 
-
+# Cite us
+If you are using our package, miMic for **any** purpose, please cite us; Shtossel, Oshrit, Shani Finkelstein, and Yoram Louzoun. "mi-Mic: a novel multi-layer statistical test for microbiota-disease associations." Genome Biology 25, no. 1 (2024): 113. https://link.springer.com/article/10.1186/s13059-024-03256-0
 
 
  
